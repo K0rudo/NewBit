@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оплата бронирования</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .payment-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+        .payment-container h2 {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin: 15px 0 5px;
+            font-weight: bold;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: 2px solid #007bff;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-container">
+        <h2>Оплата бронирования</h2>
+        <form action="confirm_payment.html" method="POST">
+            <label for="card-number">Номер карты:</label>
+            <input type="text" id="card-number" name="card_number" placeholder="0000 0000 0000 0000" required>
+
+            <label for="expiry-date">Срок действия:</label>
+            <input type="text" id="expiry-date" name="expiry_date" placeholder="MM/ГГ" required>
+
+            <label for="cvv">CVV:</label>
+            <input type="password" id="cvv" name="cvv" placeholder="***" required>
+
+            <label for="amount">Сумма к оплате:</label>
+            <input type="text" id="amount" name="amount" value="450 руб." readonly>
+
+            <button type="submit">Оплатить</button>
+        </form>
+    </div>
+</body>
+</html>

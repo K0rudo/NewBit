@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация в компьютерный клуб</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f4f4f9;
+        }
+        .registration-form {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            padding: 25px 30px;
+            width: 100%;
+            max-width: 420px;
+        }
+        .registration-form h2 {
+            margin-bottom: 20px;
+            font-size: 26px;
+            color: #333333;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: #555555;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #cccccc;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 6px rgba(0, 123, 255, 0.25);
+        }
+        .form-group button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .form-group button:hover {
+            background-color: #0056b3;
+        }
+        .error-message {
+            font-size: 14px;
+            color: red;
+            margin-top: 5px;
+            display: none;
+        }
+        .confirmation-message {
+            font-size: 16px;
+            color: green;
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+    <script>
+        // Затычка: список уже занятых логинов
+        const existingLogins = ["Кондратьев Василий", "vasya123", "gamer007"];
+
+        function validatePassword(password) {
+            const minLength = 8;
+            const hasNumber = /\d/;
+            const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/;
+
+            if (password.length < minLength) {
+                return "Пароль должен содержать не менее 8 символов.";
+            }
+            if (!hasNumber.test(password)) {
+                return "Пароль должен содержать хотя бы одну цифру.";
+            }
+            if (!hasSpecialChar.test(password)) {
+                return "Пароль должен содержать хотя бы один специальный символ.";
+            }
+            return null;
+        }
+
+        function handleFormSubmit(event) {
+            event.preventDefault();
+
+            const loginInput = document.getElementById("login");
+            const passwordInput = document.getElementById("password");
+            const loginError = document.getElementById("login-error");
+            const passwordError = document.getElementById("password-error");
+            const confirmationMessage = document.getElementById("confirmation-message");
+
+            // Проверка уникальности логина
+            if (existingLogins.includes(loginInput.value)) {
+                loginError.textContent = "Этот логин уже используется. Пожалуйста, выберите другой.";
+                loginError.style.display = "block";
+                passwordError.style.display = "none";
+                confirmationMessage.style.display = "none";
+                return;
+            }
+
+            // Проверка пароля
+            const passwordValidationError = validatePassword(passwordInput.value);
+            if (passwordValidationError) {
+                passwordError.textContent = passwordValidationError;
+                passwordError.style.display = "block";
+                loginError.style.display = "none";
+                confirmationMessage.style.display = "none";
+                return;
+            }
+
+            // Успешная регистрация
+            loginError.style.display = "none";
+            passwordError.style.display = "none";
+            confirmationMessage.style.display = "block";
+        }
+    </script>
+</head>
+<body>
+    <div class="registration-form">
+        <h2>Регистрация в компьютерный клуб</h2>
+        <form onsubmit="handleFormSubmit(event)">
+            <div class="form-group">
+                <label for="login">Логин</label>
+                <input type="text" id="login" name="login" placeholder="Введите ваш логин" required>
+                <div id="login-error" class="error-message"></div>
+            </div>
+            <div class="form-group">
+                <label for="email">Электронная почта</label>
+                <input type="email" id="email" name="email" placeholder="Введите вашу почту" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Пароль</label>
+                <input type="password" id="password" name="password" placeholder="Введите пароль" required>
+                <div id="password-error" class="error-message"></div>
+            </div>
+            <div class="form-group">
+                <button type="submit">Зарегистрироваться</button>
+            </div>
+        </form>
+        <div id="confirmation-message" class="confirmation-message">
+            Письмо с подтверждением учетной записи было отправлено на вашу электронную почту.
+        </div>
+    </div>
+</body>
+</html>

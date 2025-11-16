@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Главная страница компьютерного клуба</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+        header {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0 0 0;
+            display: flex;
+        }
+        nav ul li {
+            margin-right: 20px;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+        }
+        nav ul li a:hover {
+            text-decoration: underline;
+        }
+        main {
+            padding: 20px;
+        }
+        .welcome-section {
+            text-align: center;
+            padding: 50px 20px;
+            background: linear-gradient(135deg, #007bff, #6610f2);
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .welcome-section h2 {
+            margin: 0 0 10px;
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .feature {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+        }
+        .feature h3 {
+            margin: 10px 0;
+        }
+        .auth-section {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .auth-section button {
+            padding: 10px 20px;
+            border: none;
+            background: #007bff;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .auth-section button:hover {
+            background: #0056b3;
+        }
+        .reservation-section {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .reservation-section button {
+            padding: 20px 40px;
+            border: 2px solid #28a745;
+            background: #28a745;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        .reservation-section button:hover {
+            background: #218838;
+            border-color: #1e7e34;
+        }
+
+        /* Модальное окно */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 400px;
+            text-align: center;
+        }
+        .modal-content h2 {
+            margin-bottom: 20px;
+        }
+        .modal-content button {
+            padding: 10px 20px;
+            border: none;
+            background: #007bff;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .modal-content button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Компьютерный клуб "Новый Бит"</h1>
+        <nav>
+            <ul>
+                <li><a href="#">Главная</a></li>
+                <li><a href="#features">Возможности</a></li>
+                <li><a href="#about">О клубе</a></li>
+                <li><a href="#contact">Контакты</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="welcome-section">
+            <h2>Добро пожаловать в компьютерный клуб "Новый Бит"!</h2>
+            <p>Здесь вы найдёте всё для комфортного гейминга и работы. Забронируйте время уже сейчас!</p>
+        </section>
+
+        <section class="auth-section">
+            <button onclick="window.location.href='register.html'">Регистрация</button>
+            <button onclick="window.location.href='login.html'">Вход</button>
+        </section>
+
+        <section class="reservation-section">
+            <button onclick="checkReservation()">Бронирование компьютера</button>
+        </section>
+
+        <section id="features" class="features">
+            <div class="feature">
+                <h3>Современные компьютеры</h3>
+                <p>Высокопроизводительные машины для любых задач.</p>
+            </div>
+            <div class="feature">
+                <h3>Просторные залы</h3>
+                <p>Комфортные условия для игр и работы в компании друзей.</p>
+            </div>
+            <div class="feature">
+                <h3>Профессиональное обслуживание</h3>
+                <p>Круглосуточная поддержка и помощь нашим клиентам.</p>
+            </div>
+        </section>
+
+        <section id="about">
+            <h2>О клубе</h2>
+            <p>"Новый Бит" - это больше, чем просто компьютерный клуб. Мы создаём пространство, где технологии и комфорт встречаются, чтобы подарить вам лучшее время.</p>
+        </section>
+
+        <section id="contact">
+            <h2>Контакты</h2>
+            <p>Адрес: ул. Грибоедова, 63<br>Телефон: +7 (902) 178-53-77<br>Email: vasakondra@mail.ru</p>
+        </section>
+    </main>
+
+    <footer style="background-color: #333; color: white; text-align: center; padding: 10px 0;">
+        <p>&copy; 2025 Компьютерный клуб "Новый Бит". Все права защищены.</p>
+    </footer>
+
+    <!-- Модальное окно для уведомления о регистрации -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <h2>Чтобы забронировать компьютер, пожалуйста, зарегистрируйтесь или войдите в систему.</h2>
+            <button onclick="window.location.href='register.html'">Перейти к регистрации</button>
+            <button onclick="closeModal()">Закрыть</button>
+        </div>
+    </div>
+
+    <script>
+        // Симуляция данных о текущем пользователе
+        let user = {
+            loggedIn: false, // Пока что не залогинен
+            username: 'Кондратьев Василий'
+        };
+
+        // Функция для проверки бронирования
+        function checkReservation() {
+            if (!user.loggedIn) {
+                document.getElementById('modal').style.display = 'flex'; // Показать модальное окно
+            } else {
+                window.location.href = 'reservation.html'; // Перенаправить на страницу бронирования, если пользователь авторизован
+            }
+        }
+
+        // Функция для закрытия модального окна
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

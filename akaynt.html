@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мои брони</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+        header {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+        }
+        nav ul li {
+            margin-right: 20px;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+        }
+        nav ul li a:hover {
+            text-decoration: underline;
+        }
+        main {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .booking {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+        .booking h3 {
+            margin-top: 0;
+        }
+        .booking p {
+            margin: 5px 0;
+        }
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Мои брони</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="#">Мои брони</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h2>Здравствуйте Кондратьев Василий. Ваши активные брони</h2>
+
+        <div class="booking">
+            <h3>Бронь 1</h3>
+            <p><strong>Адрес:</strong> ул. Грибоедова, 63</p>
+            <p><strong>Номер компьютера:</strong> 3</p>
+            <p><strong>Дата и время начала:</strong> 12.05.2025 15:00</p>
+            <p><strong>Продолжительность:</strong> 2 часа</p>
+        </div>
+
+        <div class="booking">
+            <h3>Бронь 2</h3>
+            <p><strong>Адрес:</strong> ул. Грибоедова, 63</p>
+            <p><strong>Номер компьютера:</strong> 5</p>
+            <p><strong>Дата и время начала:</strong> 15.05.2025 17:00</p>
+            <p><strong>Продолжительность:</strong> 3 часа</p>
+        </div>
+
+        <!-- Добавьте больше броней, если нужно -->
+
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Компьютерный клуб "Новый Бит". Все права защищены.</p>
+    </footer>
+</body>
+</html>

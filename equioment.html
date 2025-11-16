@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Оборудование клуба</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #333;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    nav ul {
+      list-style: none;
+      display: flex;
+      padding: 0;
+      margin: 0;
+    }
+    nav ul li {
+      margin-left: 20px;
+    }
+    nav ul li a {
+      color: white;
+      text-decoration: none;
+    }
+    nav ul li a:hover {
+      text-decoration: underline;
+    }
+    .tabs {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+    }
+    .tab-button {
+      padding: 10px 20px;
+      margin: 0 10px;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    .tab-button.active {
+      background-color: #0056b3;
+    }
+    .tab-content {
+      display: none;
+      padding: 20px;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .pc-card {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      padding: 15px;
+      max-width: 400px;
+      margin: 0 auto 20px auto;
+      text-align: center;
+      position: relative;
+    }
+    .pc-card img {
+      max-width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+    .pc-card h3 {
+      margin: 10px 0;
+    }
+    .pc-card p {
+      margin: 5px 0;
+      text-align: left;
+    }
+    .edit-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: #28a745;
+      border: none;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .edit-btn:hover {
+      background-color: #218838;
+    }
+    /* Модальное окно */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal {
+      background: white;
+      border-radius: 10px;
+      max-width: 500px;
+      width: 90%;
+      padding: 20px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      position: relative;
+    }
+    .modal h2 {
+      margin-top: 0;
+      text-align: center;
+    }
+    .modal label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    .modal input[type="text"], .modal input[type="number"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+    .modal button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .modal .save-btn {
+      background-color: #007bff;
+      color: white;
+      margin-right: 10px;
+    }
+    .modal .save-btn:hover {
+      background-color: #0056b3;
+    }
+    .modal .close-btn {
+      background-color: #6c757d;
+      color: white;
+    }
+    .modal .close-btn:hover {
+      background-color: #5a6268;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Компьютерный клуб "Новый Бит"</h1>
+    <nav>
+      <ul>
+        <li><a href="glav_reg.html">Главная</a></li>
+        <li><a href="index.html#features">Возможности</a></li>
+        <li><a href="index.html#about">О клубе</a></li>
+        <li><a href="index.html#contact">Контакты</a></li>
+        <li><a href="equipment.html" class="active">Оборудование</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <div class="tabs">
+      <button class="tab-button active" data-tab="regular">Обычный компьютер</button>
+      <button class="tab-button" data-tab="vip">VIP компьютер</button>
+    </div>
+
+    <section id="regular" class="tab-content active">
+      <div class="pc-card" data-type="regular">
+        <button class="edit-btn" onclick="openEditModal('regular')">Редактировать</button>
+        <img src="1.jpg" />
+        <h3>Обычный ПК</h3>
+        <p><strong>Процессор:</strong> <span class="processor">Intel Core i5-10400F</span></p>
+        <p><strong>Видеокарта:</strong> <span class="gpu">NVIDIA GeForce GTX 1660 Super</span></p>
+        <p><strong>ОЗУ:</strong> <span class="ram">16 ГБ DDR4</span></p>
+        <p><strong>Накопитель:</strong> <span class="storage">SSD 512 ГБ</span></p>
+        <p><strong>Монитор:</strong> <span class="monitor">24" Full HD, 144 Гц</span></p>
+        <p><strong>Цена(руб в час):</strong> <span class="price">150</span></p>
+      </div>
+    </section>
+
+    <section id="vip" class="tab-content">
+      <div class="pc-card" data-type="vip">
+        <button class="edit-btn" onclick="openEditModal('vip')">Редактировать</button>
+        <img src="2.jpg" alt="VIP ПК" />
+        <h3>VIP ПК</h3>
+        <p><strong>Процессор:</strong> <span class="processor">Intel Core i9-13900K</span></p>
+        <p><strong>Видеокарта:</strong> <span class="gpu">NVIDIA GeForce RTX 4090</span></p>
+        <p><strong>ОЗУ:</strong> <span class="ram">32 ГБ DDR5</span></p>
+        <p><strong>Накопитель:</strong> <span class="storage">SSD 2 ТБ</span></p>
+        <p><strong>Монитор:</strong> <span class="monitor">27" QHD, 240 Гц</span></p>
+        <p><strong>Цена(руб в час):</strong> <span class="price">250</span></p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Компьютерный клуб "Новый Бит". Все права защищены.</p>
+  </footer>
+
+  <!-- Модальное окно редактирования -->
+  <div id="edit-modal" class="modal-overlay">
+    <div class="modal">
+      <h2>Редактировать</h2>
+      <form id="edit-form">
+        <label for="processor-input">Процессор:</label>
+        <input type="text" id="processor-input" name="processor" required />
+
+        <label for="gpu-input">Видеокарта:</label>
+        <input type="text" id="gpu-input" name="gpu" required />
+
+        <label for="ram-input">ОЗУ:</label>
+        <input type="text" id="ram-input" name="ram" required />
+
+        <label for="storage-input">Накопитель:</label>
+        <input type="text" id="storage-input" name="storage" required />
+
+        <label for="monitor-input">Монитор:</label>
+        <input type="text" id="monitor-input" name="monitor" required />
+
+        <label for="price-input">Цена(руб в час):</label>
+        <input type="text" id="price-input" name="price" required />
+
+        <input type="hidden" id="current-type" name="type" />
+
+        <button type="submit" class="save-btn">Сохранить</button>
+        <button type="button" class="close-btn" onclick="closeEditModal()">Отмена</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        tabContents.forEach(content => content.classList.remove('active'));
+
+        button.classList.add('active');
+        document.getElementById(button.dataset.tab).classList.add('active');
+      });
+    });
+
+    const editModal = document.getElementById('edit-modal');
+    const editForm = document.getElementById('edit-form');
+
+    function openEditModal(type) {
+      const card = document.querySelector(`.pc-card[data-type="${type}"]`);
+      if (!card) return;
+
+      // Заполняем форму текущими данными
+      editForm.processor.value = card.querySelector('.processor').textContent;
+      editForm.gpu.value = card.querySelector('.gpu').textContent;
+      editForm.ram.value = card.querySelector('.ram').textContent;
+      editForm.storage.value = card.querySelector('.storage').textContent;
+      editForm.monitor.value = card.querySelector('.monitor').textContent;
+      editForm.price.value = card.querySelector('.price').textContent;
+      editForm.type.value = type;
+
+      editModal.classList.add('active');
+    }
+
+    function closeEditModal() {
+      editModal.classList.remove('active');
+    }
+
+    editForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const type = editForm.type.value;
+      const card = document.querySelector(`.pc-card[data-type="${type}"]`);
+
+      if (card) {
+        card.querySelector('.processor').textContent = editForm.processor.value;
+        card.querySelector('.gpu').textContent = editForm.gpu.value;
+        card.querySelector('.ram').textContent = editForm.ram.value;
+        card.querySelector('.storage').textContent = editForm.storage.value;
+        card.querySelector('.monitor').textContent = editForm.monitor.value;
+        card.querySelector('.price').textContent = editForm.price.value;
+      }
+
+      closeEditModal();
+    });
+  </script>
+</body>
+</html>
