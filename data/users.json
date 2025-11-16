@@ -11,6 +11,12 @@
             "email": "vasakondra@mail.ru",
             "login": "vasa",
             "password": "111"
+        },
+        {
+            "id": "u_1763330324180_ixdvaf",
+            "email": "admin@admin.ru",
+            "login": "admin",
+            "password": "admin"
         }
     ]
 }

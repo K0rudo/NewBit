@@ -1,136 +1,132 @@
 <?php
 // api/bookings.php
-// Минимальное API для разработческой работы с бронями.
-// Создаёт/читает/удаляет записи в data/bookings.json.
-//
-// ВНИМАНИЕ: это пример для разработки. Не использовать в продакшене без доработки (аутентификация, валидация, безопасность).
+// Dev API для бронирований c проверкой дублей по (date, computer, time)
 
-// Простая политика CORS для локальной разработки (убери/сужай в проде при необходимости)
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit;
-}
+header('Access-Control-Allow-Headers: Content-Type, Accept');
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(200); exit; }
+header('Content-Type: application/json; charset=utf-8');
 
-header('Content-Type: application/json');
-
-// Путь к каталогу данных и файлу
 $DATA_DIR = __DIR__ . '/../data';
 $FILE = $DATA_DIR . '/bookings.json';
 
-// Создаём директорию и файл при необходимости
-if (!is_dir($DATA_DIR)) {
-    mkdir($DATA_DIR, 0755, true);
-}
-if (!file_exists($FILE)) {
-    file_put_contents($FILE, json_encode(['bookings' => []], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);
-}
+if (!is_dir($DATA_DIR)) mkdir($DATA_DIR, 0755, true);
+if (!file_exists($FILE)) file_put_contents($FILE, json_encode(['bookings'=>[]], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);
 
-// Утилиты чтения/записи с блокировкой
 function read_data($file) {
-    $content = @file_get_contents($file);
-    if ($content === false || $content === '') {
-        return ['bookings' => []];
-    }
-    $j = json_decode($content, true);
-    if (!is_array($j)) return ['bookings' => []];
-    if (!isset($j['bookings']) || !is_array($j['bookings'])) $j['bookings'] = [];
+    $s = @file_get_contents($file);
+    if ($s === false || $s === '') return ['bookings'=>[]];
+    $j = json_decode($s, true);
+    if (!is_array($j) || !isset($j['bookings']) || !is_array($j['bookings'])) return ['bookings'=>[]];
     return $j;
 }
-
 function write_data($file, $data) {
     $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-    // atomic write
     $tmp = $file . '.tmp';
     file_put_contents($tmp, $json, LOCK_EX);
     rename($tmp, $file);
 }
+function respond($data, $code = 200) {
+    http_response_code($code);
+    echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+    exit;
+}
+function normalize_booking($b){
+    $out = [];
+    $out['id'] = isset($b['id']) ? (string)$b['id'] : null;
+    $out['date'] = isset($b['date']) ? (string)$b['date'] : '';
+    $out['computer'] = isset($b['computer']) ? (string)$b['computer'] : '';
+    $out['time'] = isset($b['time']) ? (string)$b['time'] : '';
+    $out['user_login'] = isset($b['user_login']) ? (string)$b['user_login'] : (isset($b['user']) ? (string)$b['user'] : '');
+    $out['user_email'] = isset($b['user_email']) ? (string)$b['user_email'] : '';
+    $out['user_id'] = isset($b['user_id']) ? (string)$b['user_id'] : '';
+    $out['created_at'] = isset($b['created_at']) ? (string)$b['created_at'] : null;
+    return $out;
+}
 
-// Получаем метод и парсим query string
 $method = $_SERVER['REQUEST_METHOD'];
 parse_str($_SERVER['QUERY_STRING'] ?? '', $qs);
 
-// GET — вернуть всё
+// GET
 if ($method === 'GET') {
     $j = read_data($FILE);
-    echo json_encode($j, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-    exit;
+    respond($j);
 }
 
-// POST — добавить брони
+// POST: add bookings (supports action:add with bookings array)
 if ($method === 'POST') {
-    $input = json_decode(file_get_contents('php://input'), true);
-    if (!is_array($input)) {
-        http_response_code(400);
-        echo json_encode(['success' => false, 'error' => 'invalid_json']);
-        exit;
-    }
+    $raw = file_get_contents('php://input');
+    $input = json_decode($raw, true);
+    if (!is_array($input)) respond(['success'=>false,'error'=>'invalid_json'], 400);
 
-    $j = read_data($FILE);
+    $data = read_data($FILE);
+    $added = [];
+    $skipped = []; // дубликаты
 
-    // Поддерживаем payload { action: "add", bookings: [ ... ] }
     if (isset($input['action']) && $input['action'] === 'add' && isset($input['bookings']) && is_array($input['bookings'])) {
         foreach ($input['bookings'] as $b) {
-            // Базовая валидация/присвоение id
-            if (!isset($b['id'])) $b['id'] = 'b_' . time() . '_' . bin2hex(random_bytes(4));
-            if (!isset($b['date'])) $b['date'] = '';
-            if (!isset($b['computer'])) $b['computer'] = '';
-            if (!isset($b['time'])) $b['time'] = '';
-            if (!isset($b['user'])) $b['user'] = '';
-            $j['bookings'][] = $b;
+            $nb = normalize_booking($b);
+            if (!$nb['id']) $nb['id'] = 'b_'.time().'_'.bin2hex(random_bytes(4));
+            if (!$nb['created_at']) $nb['created_at'] = gmdate('c');
+
+            // проверка дубликата: существует запись с тем же date, computer, time
+            $is_dup = false;
+            foreach ($data['bookings'] as $exist){
+                if (isset($exist['date']) && isset($exist['computer']) && isset($exist['time'])) {
+                    if ($exist['date'] === $nb['date'] && (string)$exist['computer'] === (string)$nb['computer'] && $exist['time'] === $nb['time']) {
+                        $is_dup = true;
+                        $skipped[] = ['existing_id'=> $exist['id'] ?? null, 'date'=>$exist['date'], 'computer'=>$exist['computer'], 'time'=>$exist['time']];
+                        break;
+                    }
+                }
+            }
+            if ($is_dup) continue;
+            $data['bookings'][] = $nb;
+            $added[] = $nb['id'];
         }
-        write_data($FILE, $j);
-        echo json_encode(['success' => true]);
-        exit;
+        if (count($added) > 0) write_data($FILE, $data);
+        respond(['success'=>true,'added'=>$added,'skipped'=>$skipped]);
     }
 
-    // Или если прислали один объект брони — добавим его
+    // одиночный объект
     if (isset($input['date']) && isset($input['computer']) && isset($input['time'])) {
-        $b = $input;
-        if (!isset($b['id'])) $b['id'] = 'b_' . time() . '_' . bin2hex(random_bytes(4));
-        $j['bookings'][] = $b;
-        write_data($FILE, $j);
-        echo json_encode(['success' => true, 'id' => $b['id']]);
-        exit;
+        $nb = normalize_booking($input);
+        if (!$nb['id']) $nb['id'] = 'b_'.time().'_'.bin2hex(random_bytes(4));
+        if (!$nb['created_at']) $nb['created_at'] = gmdate('c');
+        // проверка дубликата
+        foreach ($data['bookings'] as $exist){
+            if ($exist['date'] === $nb['date'] && (string)$exist['computer'] === (string)$nb['computer'] && $exist['time'] === $nb['time']) {
+                respond(['success'=>false,'error'=>'duplicate','existing_id'=>$exist['id'] ?? null], 409);
+            }
+        }
+        $data['bookings'][] = $nb;
+        write_data($FILE, $data);
+        respond(['success'=>true,'id'=>$nb['id']]);
     }
 
-    http_response_code(400);
-    echo json_encode(['success' => false, 'error' => 'invalid_input']);
-    exit;
+    respond(['success'=>false,'error'=>'invalid_input'], 400);
 }
 
-// DELETE — удалить бронь по id, ожидается ?id=...
+// DELETE
 if ($method === 'DELETE') {
     $id = $qs['id'] ?? null;
-    if (!$id) {
-        http_response_code(400);
-        echo json_encode(['success' => false, 'error' => 'no_id']);
-        exit;
-    }
-    $j = read_data($FILE);
+    if (!$id) respond(['success'=>false,'error'=>'no_id'], 400);
+    $data = read_data($FILE);
     $found = false;
-    foreach ($j['bookings'] as $k => $v) {
+    foreach ($data['bookings'] as $k => $v) {
         if (isset($v['id']) && (string)$v['id'] === (string)$id) {
-            array_splice($j['bookings'], $k, 1);
+            array_splice($data['bookings'], $k, 1);
             $found = true;
             break;
         }
     }
     if ($found) {
-        write_data($FILE, $j);
-        echo json_encode(['success' => true]);
-        exit;
+        write_data($FILE, $data);
+        respond(['success'=>true]);
     } else {
-        http_response_code(404);
-        echo json_encode(['success' => false, 'error' => 'not_found']);
-        exit;
+        respond(['success'=>false,'error'=>'not_found'], 404);
     }
 }
 
-// Метод не поддерживается
-http_response_code(405);
-echo json_encode(['success' => false, 'error' => 'method_not_allowed']);
-exit;
-?>
+respond(['success'=>false,'error'=>'method_not_allowed'], 405);

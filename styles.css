@@ -71,3 +71,105 @@ nav a{margin-left:6px;padding:6px 8px}}
 .form-row label { display:block; margin-bottom:6px; font-weight:700; }
 .form-row input { width:100%; padding:10px; border-radius:6px; border:1px solid #ddd; }
 .form-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:10px; }
+/* --- вкладки авторизации сверху --- */
+.auth-tabs-top {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.auth-tab {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  background: rgba(0,0,0,0.04);
+  color: #222;
+  border: 1px solid rgba(0,0,0,0.06);
+  cursor: pointer;
+  text-align: center;
+  font-weight: 600;
+}
+.auth-tab.active {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+.auth-panel { margin-top: 8px; }
+
+/* центрирование формы на странице */
+.form-card { max-width: 460px; margin: 18px auto; padding: 16px; }
+
+/* сообщения */
+.message.info { background: #d1ecf1; color: #0c5460; border:1px solid #bee5eb; padding:8px; border-radius:6px; }
+.message.success { background:#d4edda;color:#155724;border:1px solid #c3e6cb;padding:8px;border-radius:6px; }
+.message.error { background:#f8d7da;color:#721c24;border:1px solid #f5c6cb;padding:8px;border-radius:6px; }
+
+/* когда скрываем панель через класс style.display = 'none' — уже handled */
+
+
+/* ===== Сетка компьютеров ===== */
+.computers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+/* квадратные плитки */
+.computer-tile {
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #e6e6e6;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 8px;
+  transition: transform .12s ease, box-shadow .12s ease;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.04);
+  color: #fff;
+  font-weight:700;
+}
+.computer-tile .comp-num { font-size:20px; color: #fff; }
+.computer-tile .comp-type { font-size:12px; opacity:0.9; margin-top:6px; }
+
+/* types */
+.computer-tile.regular { background: linear-gradient(180deg,#2b8cff,#007bff); }
+.computer-tile.vip     { background: linear-gradient(180deg,#28a745,#1e7e34); }
+.computer-tile.broken  { background: linear-gradient(180deg,#dc3545,#b02a37); cursor: not-allowed; }
+
+/* hover */
+.computer-tile:hover { transform: translateY(-4px); box-shadow:0 10px 20px rgba(0,0,0,0.12); }
+
+/* booking panel fixed width */
+#booking-panel {
+  width: 480px;
+  max-width: calc(100% - 32px);
+  margin: 16px auto;
+  box-sizing: border-box;
+}
+
+
+
+/* доступный слот — нейтральный (фон белый остаётся, но не изменяется при hover) */
+.time-slot.available {
+  background: #fff;
+  border: 1px solid #ddd;
+  color: #222;
+}
+
+/* выбранный слот */
+.time-slot.selected {
+  background: #007bff;
+  color: #fff;
+  border-color: #0069d9;
+}
+
+/* занятый слот */
+.time-slot.booked {
+  background: #f8d7da;
+  border-color: #f5c6cb;
+  color: #721c24;
+  cursor: not-allowed;
+}

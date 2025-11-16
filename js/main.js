@@ -1,6 +1,6 @@
 /* js/main.js */
 (function(){
-  const USER_KEY = 'nb_user_current'; // хранит объект текущего пользователя (json string)
+  const USER_KEY = 'nb_user_current';
 
   function getCurrentUser(){
     try { return JSON.parse(localStorage.getItem(USER_KEY) || 'null'); }
@@ -13,27 +13,23 @@
   }
 
   function renderUserArea(){
-    const ua = document.getElementById('user-area');
-    if(!ua) return;
     const link = document.getElementById('user-link');
+    const navMy = document.getElementById('nav-my-bookings');
     const user = getCurrentUser();
     if(user){
-      // показываем имя и делаем ссылку на профиль
-      link.textContent = user.login;
-      link.setAttribute('href', '#/akaynt');
-      link.classList.add('user-link');
+      if(link){ link.textContent = user.login; link.setAttribute('href','#/akaynt'); }
+      if(navMy) navMy.style.display = ''; // show
     } else {
-      link.textContent = 'Войти';
-      link.setAttribute('href', '#/login');
-      link.classList.add('user-link');
+      if(link){ link.textContent = 'Войти'; link.setAttribute('href','#/login'); }
+      if(navMy) navMy.style.display = 'none'; // hide when not logged in
     }
   }
 
-  // публичные функции для других модулей
   window.AUTH = {
     getCurrentUser,
     setCurrentUser
   };
 
-  window.addEventListener('load', ()=>{ renderUserArea(); });
+  window.addEventListener('load', ()=> renderUserArea());
+  window.addEventListener('hashchange', ()=> renderUserArea());
 })();

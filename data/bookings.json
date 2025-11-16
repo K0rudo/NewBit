@@ -1,1 +1,174 @@
-{"bookings": []}
+{
+    "bookings": [
+        {
+            "id": "b_1763332981725_z7fp",
+            "date": "2025-11-17",
+            "computer": "1",
+            "time": "00:00-01:00",
+            "user_login": "vasa",
+            "user_email": "vasakondra@mail.ru",
+            "user_id": "u_1763316051507_vec558",
+            "created_at": "2025-11-16T22:43:01.725Z"
+        },
+        {
+            "id": "b_1763332981725_c20r",
+            "date": "2025-11-17",
+            "computer": "1",
+            "time": "01:00-02:00",
+            "user_login": "vasa",
+            "user_email": "vasakondra@mail.ru",
+            "user_id": "u_1763316051507_vec558",
+            "created_at": "2025-11-16T22:43:01.725Z"
+        },
+        {
+            "id": "b_1763332981725_b702",
+            "date": "2025-11-17",
+            "computer": "1",
+            "time": "02:00-03:00",
+            "user_login": "vasa",
+            "user_email": "vasakondra@mail.ru",
+            "user_id": "u_1763316051507_vec558",
+            "created_at": "2025-11-16T22:43:01.725Z"
+        },
+        {
+            "id": "b_1763332981725_e2tz",
+            "date": "2025-11-17",
+            "computer": "1",
+            "time": "03:00-04:00",
+            "user_login": "vasa",
+            "user_email": "vasakondra@mail.ru",
+            "user_id": "u_1763316051507_vec558",
+            "created_at": "2025-11-16T22:43:01.725Z"
+        },
+        {
+            "id": "b_1763332988205_x461",
+            "date": "2025-11-17",
+            "computer": "1",
+            "time": "06:00-07:00",
+            "user_login": "vasa",
+            "user_email": "vasakondra@mail.ru",
+            "user_id": "u_1763316051507_vec558",
+            "created_at": "2025-11-16T22:43:08.205Z"
+        },
+        {
+            "id": "b_1763332988205_4s0e",
+            "date": "2025-11-17",
+            "computer": "1",
+            "time": "07:00-08:00",
+            "user_login": "vasa",
+            "user_email": "vasakondra@mail.ru",
+            "user_id": "u_1763316051507_vec558",
+            "created_at": "2025-11-16T22:43:08.205Z"
+        },
+        {
+            "id": "b_1763333143126_7ril",
+            "date": "2025-11-17",
+            "computer": "1",
+            "time": "04:00-05:00",
+            "user_login": "vasa",
+            "user_email": "vasakondra@mail.ru",
+            "user_id": "u_1763316051507_vec558",
+            "created_at": "2025-11-16T22:45:43.126Z"
+        },
+        {
+            "id": "b_1763333143126_yiul",
+            "date": "2025-11-17",
+            "computer": "1",
+            "time": "05:00-06:00",
+            "user_login": "vasa",
+            "user_email": "vasakondra@mail.ru",
+            "user_id": "u_1763316051507_vec558",
+            "created_at": "2025-11-16T22:45:43.126Z"
+        },
+        {
+            "id": "b_1763333170265_uf4p",
+            "date": "2025-11-17",
+            "computer": "2",
+            "time": "00:00-01:00",
+            "user_login": "vasa",
+            "user_email": "vasakondra@mail.ru",
+            "user_id": "u_1763316051507_vec558",
+            "created_at": "2025-11-16T22:46:10.265Z"
+        },
+        {
+            "id": "b_1763333170265_r19s",
+            "date": "2025-11-17",
+            "computer": "2",
+            "time": "01:00-02:00",
+            "user_login": "vasa",
+            "user_email": "vasakondra@mail.ru",
+            "user_id": "u_1763316051507_vec558",
+            "created_at": "2025-11-16T22:46:10.265Z"
+        },
+        {
+            "id": "b_1763333170265_48f0",
+            "date": "2025-11-17",
+            "computer": "2",
+            "time": "03:00-04:00",
+            "user_login": "vasa",
+            "user_email": "vasakondra@mail.ru",
+            "user_id": "u_1763316051507_vec558",
+            "created_at": "2025-11-16T22:46:10.265Z"
+        },
+        {
+            "id": "b_1763333170265_ybgr",
+            "date": "2025-11-17",
+            "computer": "2",
+            "time": "02:00-03:00",
+            "user_login": "vasa",
+            "user_email": "vasakondra@mail.ru",
+            "user_id": "u_1763316051507_vec558",
+            "created_at": "2025-11-16T22:46:10.265Z"
+        },
+        {
+            "id": "b_1763333170265_1ddh",
+            "date": "2025-11-17",
+            "computer": "2",
+            "time": "04:00-05:00",
+            "user_login": "vasa",
+            "user_email": "vasakondra@mail.ru",
+            "user_id": "u_1763316051507_vec558",
+            "created_at": "2025-11-16T22:46:10.265Z"
+        },
+        {
+            "id": "b_1763333642058_t2bb",
+            "date": "2025-11-17",
+            "computer": "7",
+            "time": "00:00-01:00",
+            "user_login": "vasa",
+            "user_email": "vasakondra@mail.ru",
+            "user_id": "u_1763316051507_vec558",
+            "created_at": "2025-11-16T22:54:02.058Z"
+        },
+        {
+            "id": "b_1763333642058_zxrz",
+            "date": "2025-11-17",
+            "computer": "7",
+            "time": "01:00-02:00",
+            "user_login": "vasa",
+            "user_email": "vasakondra@mail.ru",
+            "user_id": "u_1763316051507_vec558",
+            "created_at": "2025-11-16T22:54:02.058Z"
+        },
+        {
+            "id": "b_1763333642058_9qj0",
+            "date": "2025-11-17",
+            "computer": "7",
+            "time": "02:00-03:00",
+            "user_login": "vasa",
+            "user_email": "vasakondra@mail.ru",
+            "user_id": "u_1763316051507_vec558",
+            "created_at": "2025-11-16T22:54:02.058Z"
+        },
+        {
+            "id": "b_1763333642058_9wcm",
+            "date": "2025-11-17",
+            "computer": "7",
+            "time": "03:00-04:00",
+            "user_login": "vasa",
+            "user_email": "vasakondra@mail.ru",
+            "user_id": "u_1763316051507_vec558",
+            "created_at": "2025-11-16T22:54:02.058Z"
+        }
+    ]
+}
