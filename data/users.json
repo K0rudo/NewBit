@@ -1,0 +1,16 @@
+{
+    "users": [
+        {
+            "id": "u_example",
+            "email": "demo@example.com",
+            "login": "demo",
+            "password": "demo123"
+        },
+        {
+            "id": "u_1763316051507_vec558",
+            "email": "vasakondra@mail.ru",
+            "login": "vasa",
+            "password": "111"
+        }
+    ]
+}
