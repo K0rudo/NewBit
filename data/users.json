@@ -34,6 +34,13 @@
             "login": "1",
             "password": "1",
             "role": "user"
+        },
+        {
+            "id": "u_1763399564461_tyshze",
+            "email": "t@mail.ru",
+            "login": "Леша",
+            "password": "1",
+            "role": "user"
         }
     ]
 }

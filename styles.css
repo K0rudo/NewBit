@@ -43,6 +43,121 @@ button.secondary{background:#6c757d}
 nav a{margin-left:6px;padding:6px 8px}}
 /* добавки для user area и форм (вставь в styles.css) */
 
+.home-page {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.hero {
+  background: linear-gradient(135deg, #007bff, #6610f2);
+  color: white;
+  text-align: center;
+  padding: 60px 20px;
+  border-radius: 12px;
+}
+
+.hero h1 {
+  font-size: 36px;
+  margin-bottom: 12px;
+}
+
+.hero p {
+  font-size: 18px;
+  margin-bottom: 24px;
+}
+
+.hero-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.primary-btn {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.primary-btn:hover {
+  background-color: #218838;
+}
+
+.secondary-btn {
+  background-color: #ffc107;
+  color: #212529;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.secondary-btn:hover {
+  background-color: #e0a800;
+}
+
+.advantages {
+  text-align: center;
+}
+
+.advantages h2 {
+  font-size: 28px;
+  margin-bottom: 24px;
+}
+
+.adv-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.adv-card {
+  background: white;
+  padding: 20px;
+  width: 250px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  text-align: center;
+  transition: transform 0.3s;
+}
+
+.adv-card:hover {
+  transform: translateY(-5px);
+}
+
+.adv-card h3 {
+  margin-bottom: 12px;
+  font-size: 20px;
+}
+
+.how-to, .contacts {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.how-to h2, .contacts h2 {
+  text-align: center;
+  font-size: 28px;
+  margin-bottom: 16px;
+}
+
+.how-to ol {
+  padding-left: 20px;
+}
+
+.contacts p {
+  text-align: center;
+  font-size: 16px;
+}
+
+
 .user-area {
   display: flex;
   align-items: center;
@@ -142,12 +257,36 @@ nav a{margin-left:6px;padding:6px 8px}}
 /* hover */
 .computer-tile:hover { transform: translateY(-4px); box-shadow:0 10px 20px rgba(0,0,0,0.12); }
 
-/* booking panel fixed width */
-#booking-panel {
-  width: 480px;
-  max-width: calc(100% - 32px);
-  margin: 16px auto;
-  box-sizing: border-box;
+/* === FORCED: единая ширина панели бронирования и панели управления бронями ===
+   Сохраняет фиксированную ширину на десктопе и адаптирует на мобилках.
+*/
+.broni-fixed-width,
+#booking-panel,
+.broni-panel {
+  width: 480px !important;
+  max-width: 480px !important;
+  margin: 16px auto !important;
+  box-sizing: border-box !important;
+}
+
+/* Внутренние карточки/контент не должны растягивать блок */
+.broni-panel > .card,
+#booking-panel,
+#booking-panel > * {
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  overflow-wrap: break-word !important;
+}
+
+/* mobile override: на узких экранах занимает почти всю ширину */
+@media (max-width: 600px) {
+  .broni-fixed-width,
+  #booking-panel,
+  .broni-panel {
+    width: calc(100% - 24px) !important;
+    max-width: calc(100% - 24px) !important;
+    margin: 12px !important;
+  }
 }
 
 /* доступный слот — нейтральный (фон белый остаётся, но не изменяется при hover) */
@@ -224,31 +363,51 @@ nav a{margin-left:6px;padding:6px 8px}}
   .pc-card img { height:160px; }
 }
 
-/* horizontal scrollbar of computers */
-.computers-scroll-wrap { overflow:hidden; padding:8px 0; }
+/* --- Prevent equipment list from expanding: fixed-width tiles + nowrap horizontal scroll --- */
+
+.computers-scroll-wrap {
+  overflow: hidden; /* скрываем внешние выпадающие элементы */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* горизонтальный контейнер: запретить перенос, включить скролл */
 .computers-scroll {
-  display:flex;
-  gap:10px;
-  overflow-x:auto;
-  padding:8px;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  padding: 8px;
   scrollbar-width: thin;
   -webkit-overflow-scrolling: touch;
+  flex-wrap: nowrap; /* ключевая строка — плитки не переносятся и не растягивают контейнер */
+  align-items: center;
 }
+
+/* фиксированный размер горизонтальных плиток (чтобы добавление не расширяло контейнер) */
 .comp-tile {
-  min-width:88px;
-  min-height:88px;
-  border-radius:8px;
+  flex: 0 0 72px;       /* фиксированная ширина */
+  width: 72px;          /* фиксированная ширина для старых браузеров */
+  height: 72px;         /* фиксированная высота */
+  min-width: 72px;
+  min-height: 72px;
+  border-radius: 8px;
   display:flex;
   align-items:center;
   justify-content:center;
   font-weight:700;
   color:#fff;
   cursor:pointer;
-  padding:10px;
-  flex:0 0 auto;
-  box-shadow:0 4px 10px rgba(0,0,0,0.08);
+  padding:8px;
+  box-shadow:0 3px 8px rgba(0,0,0,0.06);
   user-select:none;
 }
+
+/* небольшой текст внутри плитки */
+.comp-tile .num-small { font-size:14px; line-height:1; }
+
+/* если плиток много — они не увеличат родитель; появится полоса прокрутки */
 .comp-tile.regular { background: linear-gradient(180deg,#2b8cff,#007bff); } /* blue */
 .comp-tile.vip { background: linear-gradient(180deg,#28a745,#1e7e34); } /* green */
 .comp-tile.broken { background: linear-gradient(180deg,#dc3545,#b02a37); } /* red */
@@ -305,52 +464,228 @@ nav a{margin-left:6px;padding:6px 8px}}
 
 /* ===== Make equipment image fill full height of the details form/card ===== */
 
-/* Ensure the details card stretches children to equal height */
-#equip-details .card {
-  display: flex;              /* side-by-side layout: image + content */
-  gap: 12px;
-  align-items: stretch;       /* make left column stretch to card height */
-  padding: 12px;
+/* ===== Compact - уменьшённые плитки и форма оборудования ===== */
+
+/* Сетка плиток (если используется .computers-grid) — делаем плитки меньше */
+.computers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); /* уменьшено minmax */
+  gap: 8px;
+  margin-top: 10px;
 }
 
-/* Left column which contains the image — make it a flex column so image can stretch */
-#equip-details .card > div:first-child {
-  flex: 0 0 40%;              /* image column width: 40% (changeable) */
-  min-width: 240px;
+/* квадратные плитки (в сетке бронирования) — компактнее */
+.computer-tile {
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #e6e6e6;
+  aspect-ratio: 1 / 1;
   display: flex;
-  align-items: stretch;       /* allow the child <img> to stretch vertically */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 6px;                /* меньше внутренний отступ */
+  transition: transform .12s ease, box-shadow .12s ease;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.04);
+  color: #fff;
+  font-weight:700;
+  min-width: 72px;             /* гарантированная ширина */
+  min-height: 72px;            /* гарантированная высота */
+}
+.computer-tile .comp-num { font-size:16px; color: #fff; line-height:1; }
+.computer-tile .comp-type { font-size:11px; opacity:0.95; margin-top:4px; }
+
+/* Типы — сохраняем визуал */
+.computer-tile.regular { background: linear-gradient(180deg,#2b8cff,#007bff); }
+.computer-tile.vip     { background: linear-gradient(180deg,#28a745,#1e7e34); }
+.computer-tile.broken  { background: linear-gradient(180deg,#dc3545,#b02a37); cursor:not-allowed; }
+
+/* Горизонтальные плитки (scroll) — тоже уменьшаем */
+.comp-tile {
+  min-width:64px;
+  min-height:64px;
+  border-radius:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:700;
+  color:#fff;
+  cursor:pointer;
+  padding:8px;
+  flex:0 0 auto;
+  box-shadow:0 3px 8px rgba(0,0,0,0.06);
+  user-select:none;
+  font-size:15px;
+}
+.comp-tile .num-small { font-size:14px; }
+
+
+/* Активная плитка — чуть заметнее */
+.comp-tile.active, .computer-tile:focus, .computer-tile:hover { transform: translateY(-3px); box-shadow:0 8px 16px rgba(0,0,0,0.10); }
+
+/* --- Compact equipment card: smaller, but stable layout --- */
+#equip-details .card {
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+  padding: 10px;                 /* уменьшен padding */
+  box-sizing: border-box;
+  min-height: 180px;             /* уменьшенная высота */
+  max-width: 720px;              /* уменьшенная общая ширина */
+  margin: 10px auto;
+  border-radius: 8px;
 }
 
-/* Make the image take the full height of its column */
-#equip-details .card > div:first-child img,
-#equip-details img {
+/* Фото слева, чуть уже */
+.equip-photo {
+  flex: 0 0 40%;
+  min-width: 140px;
+  display: flex;
+  align-items: stretch;
+}
+.equip-photo img {
   width: 100%;
   height: 100%;
-  object-fit: cover;          /* crop/cover without distortion */
+  object-fit: cover;
   border-radius: 8px;
-  display: block;
+  display:block;
 }
 
-/* Content column: take remaining space */
-#equip-details .card > div:nth-child(2) {
+/* Правая колонка — характеристики и кнопки */
+.equip-main {
+  flex: 1 1 60%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-sizing: border-box;
+  min-width: 160px;
+}
+
+/* Характеристики — компактнее */
+.equip-info {
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
+  gap: 6px;
+  overflow: auto;
+}
+.equip-info h3 { font-size: 15px; margin:0; }
+.equip-info p { margin:3px 0; font-size:13px; color:#222; }
+
+/* Actions — кнопки вертикально, под характеристиками */
+.equip-actions {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: stretch;
+  margin-top: 6px;
 }
 
-/* For very narrow screens, stack vertically but keep image reasonably tall */
-@media (max-width:900px) {
+/* Кнопка брони — компактная, растянутая по ширине правой колонки */
+.equip-actions .btn-book {
+  width: 100%;
+  padding: 8px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 13px;
+  box-sizing: border-box;
+}
+
+/* Edit/Delete — две кнопки под кнопкой брони, равные по ширине */
+.equip-actions .admin-small {
+  display: flex;
+  gap: 6px;
+}
+.equip-actions .admin-small button {
+  flex: 1;
+  padding: 7px 8px;
+  font-size: 13px;
+  border-radius: 8px;
+}
+
+/* Немного уменьшенные общие размеры внутри карточки */
+#equip-details .card, #equip-details .card button, #equip-details .card p, #equip-details .card input, #equip-details .card select, #equip-details .card textarea {
+  font-size: 13px;
+}
+
+/* Mobile: сохраняем прежнее поведение, но тоже компактнее */
+@media (max-width: 760px) {
   #equip-details .card {
     flex-direction: column;
+    min-height: auto;
+    padding-bottom: 110px;
   }
-  #equip-details .card > div:first-child {
-    flex: 0 0 auto;
-    min-width: 0;
-    height: 320px; /* make image still tall on tablet/mobile */
+  .equip-photo { order: 1; min-height: 160px; width:100%; }
+  .equip-main { order: 2; width:100%; }
+  .equip-actions {
+    order: 3;
+    position: fixed;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    background: rgba(255,255,255,0.98);
+    padding: 8px;
+    border-radius: 10px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+    z-index: 1200;
+    flex-direction: row;
+    gap: 8px;
   }
-  #equip-details .card > div:first-child img { height: 100%; }
+  .equip-actions .btn-book { flex:1; }
+  .equip-actions .admin-small { display:none; }
 }
 
-@media (max-width:480px) {
-  #equip-details .card > div:first-child { height: 220px; }
+
+/* --- Compact equipment modal: уменьшенная форма --- */
+#equip-modal .modal {
+  width: 420px;           /* уменьшенная ширина */
+  max-width: calc(100% - 32px);
+  padding: 10px;          /* меньше паддинга */
+  border-radius: 8px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.18);
+}
+
+#equip-modal .modal h2 {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+/* компактные лейблы и поля */
+#equip-modal .modal label {
+  font-size: 12px;
+  margin-top: 8px;
+}
+#equip-modal .modal input[type="text"],
+#equip-modal .modal input[type="number"],
+#equip-modal .modal textarea,
+#equip-modal .modal select {
+  padding: 7px;
+  font-size: 12px;
+  border-radius: 5px;
+  border: 1px solid #e0e0e0;
+}
+
+/* textarea меньше по высоте */
+#equip-modal .modal textarea { height: 60px; }
+
+/* кнопки в модальном — компактнее */
+#equip-modal .modal .save-btn,
+#equip-modal .modal .close-btn {
+  padding: 8px 10px;
+  font-size: 13px;
+  border-radius: 8px;
+}
+
+/* контейнер с кнопками — чуть плотнее */
+#equip-modal .modal form > div[style*="justify-content:flex-end"] {
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* при очень маленьких экранах делаем ещё уже */
+@media (max-width: 440px) {
+  #equip-modal .modal { width: calc(100% - 24px); padding: 10px; }
+  #equip-modal .modal textarea { height: 70px; }
 }

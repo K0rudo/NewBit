@@ -1,12 +1,4 @@
-/* js/equipment.js — интегрированная, полная версия
-   Функции:
-   - загрузка списка компьютеров (api -> localStorage -> fallback)
-   - горизонтальный скрол с плитками
-   - отображение деталей ПК
-   - modal для add/update/delete (с fallback на localStorage)
-   - кнопка "Добавить" видна пользователям с ролью worker (регистронезависимо)
-   - PRESELECT из брони поддерживается
-*/
+/* js/equipment.js — обновлённая версия с поддержкой скрытой метки и выбора типа */
 (function(){
   const API = 'api/computers.php';
   const SCROLL_ID = 'computers-scroll';
@@ -77,28 +69,33 @@
     comps.forEach(c=>{
       const tile = document.createElement('div');
       tile.className = 'comp-tile ' + tileClass(c.type);
-      tile.textContent = (c.number !== undefined && c.number !== null) ? String(c.number) : (c.label || 'ПК');
+      tile.textContent = (c.number !== undefined && c.number !== null) ? String(c.number) : 'ПК';
       tile.dataset.cid = c.id;
       tile.dataset.cnum = c.number;
-      tile.title = c.label ? c.label : `ПК ${c.number}`;
+      // не показываем метку в title — только номер
+      tile.title = `ПК ${c.number}`;
       tile.addEventListener('click', ()=> onTileClick(c, tile));
       wrap.appendChild(tile);
     });
   }
 
-  // render details for a computer object c
-  function renderDetails(c){
-    const out = $id(DETAILS_ID); if(!out) return;
-    const title = `Компьютер ${c.number} — ${typeLabel(c.type)}`;
-    const img = c.image ? c.image : (c.type === 'vip' ? 'img/2.jpg' : 'img/1.jpg');
-    out.innerHTML = `
-      <div class="card" style="display:flex;gap:12px;align-items:flex-start">
-        <div style="flex:0 0 260px">
-          <img src="${esc(img)}" alt="${esc(title)}" style="width:100%;height:160px;object-fit:cover;border-radius:8px">
-        </div>
-        <div style="flex:1">
-          <h3>${esc(title)}</h3>
-          <p><strong>Метка:</strong> ${esc(c.label || '')}</p>
+ // render details for a computer object c
+// render details for a computer object c
+// Замените существующую функцию renderDetails на эту версию
+function renderDetails(c){
+  const out = $id(DETAILS_ID); if(!out) return;
+  const title = `Компьютер ${c.number} — ${typeLabel(c.type)}`;
+  const img = c.image ? c.image : (c.type === 'vip' ? 'img/2.jpg' : 'img/1.jpg');
+
+  out.innerHTML = `
+    <div class="card" style="display:flex;gap:12px;align-items:stretch">
+      <div class="equip-photo">
+        <img src="${esc(img)}" alt="${esc(title)}" />
+      </div>
+
+      <div class="equip-main">
+        <div class="equip-info">
+          <h3 style="margin:0 0 6px 0;">${esc(title)}</h3>
           <p><strong>Процессор:</strong> ${esc(c.processor||'—')}</p>
           <p><strong>Видеокарта:</strong> ${esc(c.gpu||'—')}</p>
           <p><strong>ОЗУ:</strong> ${esc(c.ram||'—')}</p>
@@ -106,48 +103,66 @@
           <p><strong>Монитор:</strong> ${esc(c.monitor||'—')}</p>
           <p><strong>Цена (руб/час):</strong> ${c.price!==undefined?String(c.price)+' ₽':'—'}</p>
           <p><strong>Примечания:</strong> ${esc(c.notes||'')}</p>
-          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
-            <button id="btn-book" class="save-btn">Забронировать</button>
+        </div>
+
+        <div class="equip-actions" aria-hidden="false">
+          <button id="btn-book" class="btn-book save-btn" type="button">Забронировать</button>
+
+          <div class="admin-small" id="admin-actions" style="display:none;">
+            <button id="btn-edit" type="button" class="save-btn">Изменить</button>
+            <button id="btn-delete" type="button" class="close-btn">Удалить</button>
           </div>
         </div>
       </div>
-    `;
+    </div>
+  `;
 
-    // book button binds: set PRESELECT and go to /broni
-    const bookBtn = $id('btn-book');
-    if(bookBtn){
-      bookBtn.addEventListener('click', ()=>{
-        window.PRESELECT_COMPUTER_ID = c.id;
-        window.PRESELECT_COMPUTER_NUMBER = c.number;
-        location.hash = '#/broni';
+  // bind book
+  const bookBtn = $id('btn-book');
+  if(bookBtn){
+    bookBtn.addEventListener('click', ()=>{
+      window.PRESELECT_COMPUTER_ID = c.id;
+      window.PRESELECT_COMPUTER_NUMBER = c.number;
+      location.hash = '#/broni';
+    });
+  }
+
+  // determine worker role and show admin actions if allowed
+  const user = currentUser();
+  let isWorker = false;
+  if(user){
+    const role = (user.role || '').toString().trim().toLowerCase();
+    if(role === 'worker' || role === 'admin') isWorker = true;
+    // fallback by login/email (if role not set)
+    if(!role && (String(user.login||'').toLowerCase() === 'worker' || String(user.email||'').toLowerCase().startsWith('worker'))) {
+      isWorker = true;
+    }
+  }
+
+  if(isWorker){
+    const adminWrap = $id('admin-actions');
+    if(adminWrap) adminWrap.style.display = 'flex';
+
+    const editBtn = $id('btn-edit');
+    if(editBtn){
+      editBtn.addEventListener('click', ()=> {
+        if(typeof openModalFor === 'function') openModalFor(c, true, false);
+        else alert('Функция редактирования недоступна');
       });
     }
 
-    // attach edit/delete for workers
-    const user = currentUser();
-    const role = user && user.role ? String(user.role).trim().toLowerCase() : '';
-    const isWorker = (role === 'worker' || role === 'admin');
-    if(isWorker){
-      const btnWrap = document.createElement('div');
-      btnWrap.style.display = 'flex'; btnWrap.style.justifyContent = 'flex-end'; btnWrap.style.gap = '8px'; btnWrap.style.marginTop = '8px';
-      const edit = document.createElement('button'); edit.textContent = 'Изменить'; edit.className = 'save-btn';
-      const del = document.createElement('button'); del.textContent = 'Удалить'; del.className = 'close-btn';
-      edit.addEventListener('click', ()=> openModalFor(c, true, false));
-      del.addEventListener('click', async ()=>{
+    const delBtn = $id('btn-delete');
+    if(delBtn){
+      delBtn.addEventListener('click', async ()=> {
         if(!confirm('Удалить компьютер? Нумерация остальных сдвинется.')) return;
-        // try server delete
         try{
           const resp = await fetch(API + '?id=' + encodeURIComponent(c.id), { method:'DELETE' });
           if(resp.ok){
             const j = await resp.json();
-            if(j && j.success){
-              await loadAndRender();
-              alert('Удалено');
-              return;
-            }
+            if(j && j.success){ await loadAndRender(); alert('Удалено'); return; }
           }
         }catch(e){ console.warn('server delete failed', e); }
-        // fallback local delete + renumber
+        // fallback local delete and renumber
         try{
           const raw = localStorage.getItem(LOCAL_KEY);
           let arr = raw ? JSON.parse(raw) : [];
@@ -161,14 +176,12 @@
             alert('Удалено (локально)');
             return;
           } else alert('Компьютер не найден локально');
-        }catch(e){ console.error('local delete failed', e); alert('Ошибка удаления'); }
+        }catch(ex){ console.error('local delete failed', ex); alert('Ошибка удаления'); }
       });
-      btnWrap.appendChild(edit); btnWrap.appendChild(del);
-      // append to the right column (second child of card)
-      const parent = $id(DETAILS_ID).querySelector('div.card > div:nth-child(2)');
-      if(parent) parent.appendChild(btnWrap);
     }
   }
+}
+
 
   // tile click handler
   function onTileClick(c, tile){
@@ -178,130 +191,193 @@
   }
 
   // modal open (c: computer object or {} for new), editable (bool), isNew (bool)
-  function openModalFor(c, editable, isNew=false){
-    if(!$id('equip-id')) return;
-    $id('equip-id').value = c && c.id ? c.id : '';
-    $id('equip-number').value = c && c.number ? c.number : '';
-    $id('equip-label').value = c && c.label ? c.label : '';
-    $id('equip-processor').value = c && c.processor ? c.processor : '';
-    $id('equip-gpu').value = c && c.gpu ? c.gpu : '';
-    $id('equip-ram').value = c && c.ram ? c.ram : '';
-    $id('equip-storage').value = c && c.storage ? c.storage : '';
-    $id('equip-monitor').value = c && c.monitor ? c.monitor : '';
-    $id('equip-price').value = c && (c.price!==undefined) ? c.price : '';
-    $id('equip-notes').value = c && c.notes ? c.notes : '';
-    $id('equip-modal-title').textContent = isNew ? 'Новый компьютер' : `Редактировать компьютер ${c && c.number ? c.number : ''}`;
+function openModalFor(c, editable, isNew=false){
+  if(!$id('equip-id')) return;
+  $id('equip-id').value = c && c.id ? c.id : '';
+  $id('equip-label').value = c && c.label ? c.label : '';
+  $id('equip-number').value = c && c.number ? c.number : '';
+  $id('equip-type').value = c && c.type ? c.type : 'regular';
+  $id('equip-processor').value = c && c.processor ? c.processor : '';
+  $id('equip-gpu').value = c && c.gpu ? c.gpu : '';
+  $id('equip-ram').value = c && c.ram ? c.ram : '';
+  $id('equip-storage').value = c && c.storage ? c.storage : '';
+  $id('equip-monitor').value = c && c.monitor ? c.monitor : '';
+  $id('equip-price').value = c && (c.price!==undefined) ? c.price : '';
+  $id('equip-notes').value = c && c.notes ? c.notes : '';
+  $id('equip-modal-title').textContent = isNew ? 'Новый компьютер' : `Редактировать компьютер ${c && c.number ? c.number : ''}`;
 
-    const fields = ['equip-label','equip-processor','equip-gpu','equip-ram','equip-storage','equip-monitor','equip-price','equip-notes'];
-    fields.forEach(id => { const el = $id(id); if(el){ if(editable) el.removeAttribute('disabled'); else el.setAttribute('disabled','disabled'); } });
+  const fields = ['equip-type','equip-processor','equip-gpu','equip-ram','equip-storage','equip-monitor','equip-price','equip-notes'];
+  fields.forEach(id => { const el = $id(id); if(el){ if(editable) el.removeAttribute('disabled'); else el.setAttribute('disabled','disabled'); } });
 
-    const saveBtn = $id('equip-save'); if(saveBtn) saveBtn.style.display = editable ? '' : 'none';
-    const delBtn = $id('equip-delete'); if(delBtn) delBtn.style.display = isNew ? 'none' : (currentUser() && (String(currentUser().role||'').toLowerCase()==='worker' ? '' : 'none'));
+  const saveBtn = $id('equip-save'); if(saveBtn) saveBtn.style.display = editable ? '' : 'none';
+  const delBtn = $id('equip-delete'); if(delBtn) delBtn.style.display = isNew ? 'none' : (currentUser() && (String(currentUser().role||'').toLowerCase()==='worker' || String(currentUser().role||'').toLowerCase()==='admin' ? '' : 'none'));
 
-    const modal = $id('equip-modal'); if(modal){ modal.classList.add('active'); modal.setAttribute('aria-hidden','false'); }
+  const modal = $id('equip-modal'); if(modal){ modal.classList.add('active'); modal.setAttribute('aria-hidden','false'); }
 
-    // bind save with local fallback
-    if(saveBtn){
-      const newBtn = saveBtn.cloneNode(true);
-      saveBtn.parentNode.replaceChild(newBtn, saveBtn);
-      newBtn.addEventListener('click', async (ev)=>{
-        ev.preventDefault();
-        const idVal = $id('equip-id').value;
-        const payload = {
-          label: $id('equip-label').value,
-          processor: $id('equip-processor').value,
-          gpu: $id('equip-gpu').value,
-          ram: $id('equip-ram').value,
-          storage: $id('equip-storage').value,
-          monitor: $id('equip-monitor').value,
-          price: Number($id('equip-price').value) || 0,
-          notes: $id('equip-notes').value
-        };
-        try{
-          if(isNew){
-            // try server add
-            try {
-              const resp = await fetch(API, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action:'add', computer: Object.assign({ id: 'c_'+Date.now()+'_rand', type:'regular' }, payload) }) });
-              if(resp.ok){
-                const j = await resp.json();
-                if(j && j.success){ await loadAndRender(); closeModal(); alert('Добавлено'); return; }
-              }
-            } catch(e){ console.warn('server add failed', e); }
-
-            // fallback local add
-            const raw = localStorage.getItem(LOCAL_KEY);
-            const arr = raw ? JSON.parse(raw) : [];
-            const newComp = Object.assign({ id: 'c_'+Date.now()+'_rand', type: 'regular' }, payload);
-            const maxNum = arr.reduce((m,x)=> Math.max(m, Number(x.number)||0), 0);
-            newComp.number = maxNum + 1;
-            arr.push(newComp);
-            saveComputersLocal(arr);
-            await loadAndRender();
-            closeModal();
-            alert('Добавлено (локально)');
-            return;
-          } else {
-            // update existing
-            try {
-              const resp = await fetch(API, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action:'update', id: idVal, computer: payload }) });
-              if(resp.ok){
-                const j = await resp.json();
-                if(j && j.success){ await loadAndRender(); closeModal(); alert('Сохранено'); return; }
-              }
-            } catch(e){ console.warn('server update failed', e); }
-
-            // fallback local update
-            const raw = localStorage.getItem(LOCAL_KEY);
-            let arr = raw ? JSON.parse(raw) : [];
-            const idx = arr.findIndex(x => String(x.id) === String(idVal));
-            if(idx > -1){
-              arr[idx] = Object.assign({}, arr[idx], payload);
-              saveComputersLocal(arr);
-              await loadAndRender();
-              closeModal();
-              alert('Сохранено (локально)');
-              return;
-            }
-            alert('Не удалось сохранить');
-          }
-        } catch(e){
-          console.error('save failed', e);
-          alert('Ошибка сохранения');
-        }
-      });
+  // ensure message area exists (inject if missing)
+  let msgEl = $id('equip-form-message');
+  if(!msgEl){
+    const form = $id('equip-form');
+    if(form){
+      msgEl = document.createElement('div');
+      msgEl.id = 'equip-form-message';
+      form.insertBefore(msgEl, form.querySelector('div[style*="display:flex;gap:8px;justify-content:flex-end"]') || null);
     }
+  }
+  if(msgEl) msgEl.innerHTML = '';
 
-    // bind delete in modal (with fallback)
-    if($id('equip-delete')){
-      $id('equip-delete').onclick = async () => {
-        if(!confirm('Удалить компьютер? Нумерация сдвинется.')) return;
-        const idVal = $id('equip-id').value;
-        try{
-          const resp = await fetch(API + '?id=' + encodeURIComponent(idVal), { method:'DELETE' });
-          if(resp.ok){
-            const j = await resp.json();
-            if(j && j.success){ await loadAndRender(); closeModal(); alert('Удалено'); return; }
-          }
-        }catch(e){ console.warn('server delete failed', e); }
-        // fallback local delete and renumber
-        try{
+  // validation helper
+  function isFormValid(){
+    try{
+      const required = ['equip-type','equip-processor','equip-gpu','equip-ram','equip-storage','equip-monitor','equip-price'];
+      for(const id of required){
+        const el = $id(id);
+        if(!el) return false;
+        const v = String(el.value || '').trim();
+        if(v === '') return false;
+      }
+      const priceVal = Number($id('equip-price').value);
+      if(isNaN(priceVal) || priceVal < 0) return false;
+      return true;
+    }catch(e){ return false; }
+  }
+
+  // show/hide message and toggle save button
+  function updateValidationUI(){
+    const btn = $id('equip-save');
+    if(btn) {
+      btn.disabled = !isFormValid();
+      if(btn.disabled) btn.classList.add('disabled'); else btn.classList.remove('disabled');
+    }
+    if(msgEl){
+      if(!isFormValid()){
+        msgEl.innerHTML = `<div class="message error">Есть незаполненные обязательные поля: тип, процессор, видеокарта, ОЗУ, накопитель, монитор и цена.</div>`;
+      } else {
+        msgEl.innerHTML = '';
+      }
+    }
+  }
+
+  // attach listeners
+  const watch = ['equip-type','equip-processor','equip-gpu','equip-ram','equip-storage','equip-monitor','equip-price'];
+  watch.forEach(id => {
+    const el = $id(id);
+    if(!el) return;
+    // remove previous handlers if any (defensive)
+    el.oninput = null;
+    el.addEventListener('input', updateValidationUI);
+  });
+
+  // init validation state
+  updateValidationUI();
+
+  // bind save (ensure final validation)
+  if(saveBtn){
+    const newBtn = saveBtn.cloneNode(true);
+    saveBtn.parentNode.replaceChild(newBtn, saveBtn);
+    newBtn.addEventListener('click', async (ev)=>{
+      ev.preventDefault();
+      if(!isFormValid()){
+        updateValidationUI();
+        return;
+      }
+
+      const idVal = $id('equip-id').value;
+      const payload = {
+        label: $id('equip-label').value || '',
+        type: $id('equip-type').value || 'regular',
+        processor: $id('equip-processor').value,
+        gpu: $id('equip-gpu').value,
+        ram: $id('equip-ram').value,
+        storage: $id('equip-storage').value,
+        monitor: $id('equip-monitor').value,
+        price: Number($id('equip-price').value) || 0,
+        notes: $id('equip-notes').value
+      };
+
+      try{
+        if(isNew){
+          try {
+            const resp = await fetch(API, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action:'add', computer: Object.assign({ id: 'c_'+Date.now()+'_rand' }, payload) }) });
+            if(resp.ok){
+              const j = await resp.json();
+              if(j && j.success){ await loadAndRender(); closeModal(); alert('Добавлено'); return; }
+            }
+          } catch(e){ console.warn('server add failed', e); }
+          // fallback local
+          const raw = localStorage.getItem(LOCAL_KEY);
+          const arr = raw ? JSON.parse(raw) : [];
+          const newComp = Object.assign({ id: 'c_'+Date.now()+'_rand' }, payload);
+          const maxNum = arr.reduce((m,x)=> Math.max(m, Number(x.number)||0), 0);
+          newComp.number = maxNum + 1;
+          arr.push(newComp);
+          saveComputersLocal(arr);
+          await loadAndRender();
+          closeModal();
+          alert('Добавлено (локально)');
+          return;
+        } else {
+          try {
+            const resp = await fetch(API, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action:'update', id: idVal, computer: payload }) });
+            if(resp.ok){
+              const j = await resp.json();
+              if(j && j.success){ await loadAndRender(); closeModal(); alert('Сохранено'); return; }
+            }
+          } catch(e){ console.warn('server update failed', e); }
+          // fallback local update
           const raw = localStorage.getItem(LOCAL_KEY);
           let arr = raw ? JSON.parse(raw) : [];
           const idx = arr.findIndex(x => String(x.id) === String(idVal));
           if(idx > -1){
-            arr.splice(idx,1);
-            arr.sort((a,b)=> (Number(a.number)||0) - (Number(b.number)||0));
-            arr.forEach((x,i)=> x.number = i+1);
+            arr[idx] = Object.assign({}, arr[idx], payload);
             saveComputersLocal(arr);
             await loadAndRender();
             closeModal();
-            alert('Удалено (локально)');
+            alert('Сохранено (локально)');
             return;
-          } else alert('Компьютер не найден локально');
-        }catch(e){ console.error('local delete failed', e); alert('Ошибка при удалении'); }
-      };
-    }
+          }
+          alert('Не удалось сохранить');
+        }
+      } catch(e){
+        console.error('save failed', e);
+        alert('Ошибка сохранения');
+      }
+    });
   }
+
+  // bind delete unchanged
+  if($id('equip-delete')){
+    $id('equip-delete').onclick = async () => {
+      if(!confirm('Удалить компьютер? Нумерация сдвинется.')) return;
+      const idVal = $id('equip-id').value;
+      try{
+        const resp = await fetch(API + '?id=' + encodeURIComponent(idVal), { method:'DELETE' });
+        if(resp.ok){
+          const j = await resp.json();
+          if(j && j.success){ await loadAndRender(); closeModal(); alert('Удалено'); return; }
+        }
+      }catch(e){ console.warn('server delete failed', e); }
+      // fallback local delete and renumber
+      try{
+        const raw = localStorage.getItem(LOCAL_KEY);
+        let arr = raw ? JSON.parse(raw) : [];
+        const idx = arr.findIndex(x => String(x.id) === String(idVal));
+        if(idx > -1){
+          arr.splice(idx,1);
+          arr.sort((a,b)=> (Number(a.number)||0) - (Number(b.number)||0));
+          arr.forEach((x,i)=> x.number = i+1);
+          saveComputersLocal(arr);
+          await loadAndRender();
+          closeModal();
+          alert('Удалено (локально)');
+          return;
+        } else alert('Компьютер не найден локально');
+      }catch(e){ console.error('local delete failed', e); alert('Ошибка при удалении'); }
+    };
+  }
+}
+
+
 
   function closeModal(){ const m = $id('equip-modal'); if(m){ m.classList.remove('active'); m.setAttribute('aria-hidden','true'); } }
 
@@ -309,7 +385,7 @@
   function renderAddButton(){
     const area = $id(ADD_AREA_ID); if(!area) return; area.innerHTML = '';
     const user = currentUser();
-    if(user && String(user.role).toLowerCase() === 'worker'){
+    if(user && (String(user.role).toLowerCase() === 'worker' || String(user.role).toLowerCase() === 'admin')){
       const btn = document.createElement('button');
       btn.className='save-btn';
       btn.textContent = 'Добавить компьютер';

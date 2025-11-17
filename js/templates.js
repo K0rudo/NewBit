@@ -1,15 +1,54 @@
 /* Register HTML templates used by the SPA. Save as js/templates.js */
 window.TEMPLATES = (function(){
   return {
-    home: `
-      <div class="card">
-        <h2>Компьютерный клуб "Новый Бит"</h2>
-        <!-- TODO: при желании замените текст ниже на содержимое glav.html из репозитория -->
-        <p>Добро пожаловать в компьютерный клуб «Новый Бит» — место для игр, учебы и встреч единомышленников. У нас современные компьютеры, удобное рабочее пространство и гибкие тарифы бронирования.</p>
-        <p>Забронируйте компьютер на нужную дату и время, проверьте свои брони в личном кабинете, или посмотрите наше оборудование в разделе «Оборудование».</p>
-      </div>
-    `,
+home: `
+  <div class="home-page">
 
+    <!-- Приветственный баннер -->
+    <section class="hero">
+      <h1>Компьютерный клуб "Новый Бит"</h1>
+      <p>Место, где технологии и комфорт встречаются для игр, работы и встреч единомышленников.</p>
+    </section>
+
+    <!-- Преимущества клуба -->
+    <section class="advantages">
+      <h2>Наши преимущества</h2>
+      <div class="adv-cards">
+        <div class="adv-card">
+          <h3>Современные компьютеры</h3>
+          <p>Высокопроизводительные ПК для игр и работы.</p>
+        </div>
+        <div class="adv-card">
+          <h3>Просторные залы</h3>
+          <p>Комфортное пространство для игр и работы в компании друзей.</p>
+        </div>
+        <div class="adv-card">
+          <h3>Профессиональное обслуживание</h3>
+          <p>Поддержка и помощь клиентам круглосуточно.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Как забронировать -->
+    <section class="how-to">
+      <h2>Как забронировать</h2>
+      <ol>
+        <li>Выберите компьютер в разделе «Бронирование».</li>
+        <li>Укажите дату и время.</li>
+        <li>Подтвердите бронь и ждите подтверждение.</li>
+      </ol>
+    </section>
+
+    <!-- Контакты -->
+    <section class="contacts">
+      <h2>Контакты</h2>
+      <p>Адрес: ул. Грибоедова, 63</p>
+      <p>Телефон: +7 (902) 178-53-77</p>
+      <p>Email: vasakondra@mail.ru</p>
+    </section>
+
+  </div>
+`,
     /* ===== broni template (заменить в js/templates.js) ===== */
 broni: `
   <div class="card">
@@ -68,32 +107,82 @@ broni: `
 
     analiz: `
       <div class="card">
-        <h2>Отчёты</h2>
-        <label for="rep-computer">Компьютер</label>
-        <select id="rep-computer">
-          <option value="all">Все</option>
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-          <option value="6">6</option>
-          <option value="7">7</option>
-          <option value="8">8</option>
-          <option value="9">9</option>
-          <option value="10">10</option>
-        </select>
-        <label for="rep-start">Дата начала</label>
-        <input type="date" id="rep-start">
-        <label for="rep-end">Дата окончания</label>
-        <input type="date" id="rep-end">
-        <button id="rep-gen">Сформировать</button>
-        <table class="report-table" id="rep-table">
-          <thead><tr><th>Дата</th><th>Компьютер</th><th>Часы</th><th>Пользователь</th></tr></thead>
-          <tbody></tbody>
-          <tfoot><tr><td colspan="3">Итого брони</td><td id="rep-count">0</td></tr></tfoot>
-        </table>
-      </div>
+  <h2>Отчёты</h2>
+  <label for="rep-type">Тип отчёта</label>
+  <select id="rep-type">
+    <option value="list">Список бронирований</option>
+    <option value="income">Доходы по компьютерам</option>
+    <option value="used">Самые используемые компьютеры</option>
+    <option value="user">Бронирования по пользователям</option>
+  </select>
+
+  <label for="rep-computer">Компьютер</label>
+  <select id="rep-computer">
+    <option value="all">Все</option>
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+    <option value="6">6</option>
+    <option value="7">7</option>
+    <option value="8">8</option>
+    <option value="9">9</option>
+    <option value="10">10</option>
+  </select>
+
+  <label for="rep-start">Дата начала</label>
+  <input type="date" id="rep-start">
+
+  <label for="rep-end">Дата окончания</label>
+  <input type="date" id="rep-end">
+
+  <button id="rep-gen">Сформировать</button>
+
+  <!-- Таблица списка бронирований -->
+  <table class="report-table" id="rep-table">
+    <thead>
+      <tr><th>Дата</th><th>Компьютер</th><th>Часы</th><th>Пользователь</th></tr>
+    </thead>
+    <tbody></tbody>
+    <tfoot>
+      <tr><td colspan="3">Итого брони</td><td id="rep-count">0</td></tr>
+    </tfoot>
+  </table>
+
+  <!-- Таблица доходов по компьютерам -->
+  <table class="report-table" id="rep-table-income" style="display:none;">
+    <thead>
+      <tr><th>Компьютер</th><th>Часы</th><th>Ставка</th><th>Доход</th></tr>
+    </thead>
+    <tbody></tbody>
+    <tfoot>
+      <tr><td colspan="3">Итого доход</td><td id="income-total">0</td></tr>
+    </tfoot>
+  </table>
+
+  <!-- Таблица самых используемых компьютеров -->
+  <table class="report-table" id="rep-table-used" style="display:none;">
+    <thead>
+      <tr><th>Компьютер</th><th>Часы</th></tr>
+    </thead>
+    <tbody></tbody>
+    <tfoot>
+      <tr><td>Всего часов</td><td id="used-total">0</td></tr>
+    </tfoot>
+  </table>
+
+  <!-- Таблица бронирований по пользователям -->
+  <table class="report-table" id="rep-table-user" style="display:none;">
+    <thead>
+      <tr><th>Пользователь</th><th>Бронирования</th></tr>
+    </thead>
+    <tbody></tbody>
+    <tfoot>
+      <tr><td>Итого бронирований</td><td id="user-total">0</td></tr>
+    </tfoot>
+  </table>
+</div>
     `,
 
     equioment: `
@@ -120,8 +209,16 @@ broni: `
         <label>Номер</label>
         <input id="equip-number" type="number" disabled>
 
-        <label>Метка</label>
-        <input id="equip-label" type="text">
+        <!-- label скрыта: хранится, но не видна -->
+        <input id="equip-label" type="hidden">
+
+        <!-- выбор типа (видно при редактировании/добавлении персоналом) -->
+        <label>Тип</label>
+        <select id="equip-type">
+          <option value="regular">Обычный</option>
+          <option value="vip">VIP</option>
+          <option value="broken">Ремонт</option>
+        </select>
 
         <label>Процессор</label>
         <input id="equip-processor" type="text">
@@ -155,6 +252,7 @@ broni: `
     </div>
   </div>
 `,
+
 
 
     /* Страница регистрации */

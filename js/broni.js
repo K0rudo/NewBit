@@ -185,7 +185,17 @@
     dateInput.value = `${yyyy}-${mm}-${dd}`;
     renderTimeSlotsFor(dateInput.value);
 
-    const cancelBtn = el('booking-cancel'); if(cancelBtn) cancelBtn.onclick = ()=> { panel.style.display='none'; currentComputer=null; selectedTimes=[]; updateBookingTotal(); };
+const cancelBtn = el('booking-cancel');
+if (cancelBtn) cancelBtn.onclick = ()=> {
+  try {
+    panel.style.display = 'none';
+    // НЕ трогаем panel.style.width / maxWidth — оставляем фиксированную ширину
+    // удаляем только внутренний выбор
+  } catch(e){ /* ignore */ }
+  currentComputer = null;
+  selectedTimes = [];
+  updateBookingTotal();
+};
     const payBtn = el('booking-pay'); if(payBtn) payBtn.onclick = ()=> payBooking();
     dateInput.onchange = ()=> {
       const d = new Date(dateInput.value); d.setHours(0,0,0,0);
@@ -350,51 +360,91 @@
     });
   }
 
-  // PAGE INIT for broni
-    window.PAGE_INIT.broni = async function(){
-    await refreshBookingsCache();
-    await renderComputersGrid();
-    // tabs handlers (local)
-    document.querySelectorAll('.broni-tab').forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        document.querySelectorAll('.broni-tab').forEach(b=>b.classList.remove('active'));
-        document.querySelectorAll('.broni-panel').forEach(p=>p.style.display='none');
-        btn.classList.add('active');
-        const t = btn.dataset.tab;
-        const el = document.getElementById(t);
-        if(el) el.style.display = '';
-        // when switching to manage tab — render panel
-        if(t === 'tab-manage') renderWorkerBookingsPanel();
-      });
-    });
+window.PAGE_INIT.broni = async function(){
+  await refreshBookingsCache();
+  await renderComputersGrid();
+  // определяем пользователя и роль
+  const user = (window.AUTH && window.AUTH.getCurrentUser) ? window.AUTH.getCurrentUser() : JSON.parse(localStorage.getItem('nb_user_current')||'null');
+  const role = (user && user.role) ? String(user.role).toLowerCase() : '';
+  const isStaff = role === 'worker' || role === 'admin';
 
-    // preselect logic (unchanged)
-    const preId = window.PRESELECT_COMPUTER_ID;
-    const preNum = window.PRESELECT_COMPUTER_NUMBER || window.SELECT_COMPUTER_ID;
-    if(preId || (preNum !== undefined && preNum !== null)){
-      const comps = await loadComputers();
-      let comp = null;
-      if(preId) comp = comps.find(x => x.id && String(x.id) === String(preId));
-      if(!comp && preNum !== undefined && preNum !== null) comp = comps.find(x => x.number && String(x.number) === String(preNum));
-      if(comp) {
-        showBookingPanelFor(comp);
-        delete window.PRESELECT_COMPUTER_ID; delete window.PRESELECT_COMPUTER_NUMBER; delete window.SELECT_COMPUTER_ID;
+  // Элементы табов/panels
+  const tabsRoot = document.querySelector('.broni-tabs');
+  const tabButtons = document.querySelectorAll('.broni-tab');
+  const panelBook = document.getElementById('tab-book');
+  const panelManage = document.getElementById('tab-manage');
+
+  // Если это сотрудник — показываем табы и навешиваем обработчики
+  if(isStaff){
+    if(tabsRoot) tabsRoot.style.display = '';
+    // поведение вкладок (локальное)
+    tabButtons.forEach(btn=>{
+      btn.style.display = '';
+      btn.classList.remove('active');
+    });
+    // активируем первую вкладку (Бронь) по умолчанию
+    if(tabButtons.length){
+      tabButtons.forEach(b => {
+        const t = b.dataset.tab;
+        const p = document.getElementById(t);
+        if(p) p.style.display = 'none';
+      });
+      const first = document.querySelector('.broni-tab[data-tab="tab-book"]');
+      if(first) {
+        first.classList.add('active');
+        const t = first.dataset.tab;
+        const p = document.getElementById(t);
+        if(p) p.style.display = '';
       }
     }
+    // навесим клики
+    tabButtons.forEach(btn=>{
+      btn.onclick = ()=>{
+        tabButtons.forEach(b=>b.classList.remove('active'));
+        document.querySelectorAll('.broni-panel').forEach(p=>p.style.display='none');
+        btn.classList.add('active');
+        const target = btn.dataset.tab;
+        const el = document.getElementById(target);
+        if(el) el.style.display = '';
+        if(target === 'tab-manage') renderWorkerBookingsPanel();
+      };
+    });
+  } else {
+    // Обычный пользователь — СКРЫВАЕМ таббар и показываем только панель бронирования (tab-book)
+    if(tabsRoot) tabsRoot.style.display = 'none';
+    // скрыть manage панель
+    if(panelManage) panelManage.style.display = 'none';
+    // показать book панель (она уже в DOM)
+    if(panelBook) panelBook.style.display = '';
+  }
 
-    const payBtn = el('booking-pay');
-    if(payBtn) payBtn.style.display = 'none';
-  };
+  // preselect logic (если кто-то предварительно выбрал ПК в equip)
+  const preId = window.PRESELECT_COMPUTER_ID;
+  const preNum = window.PRESELECT_COMPUTER_NUMBER || window.SELECT_COMPUTER_ID;
+  if(preId || (preNum !== undefined && preNum !== null)){
+    const comps = await loadComputers();
+    let comp = null;
+    if(preId) comp = comps.find(x => x.id && String(x.id) === String(preId));
+    if(!comp && preNum !== undefined && preNum !== null) comp = comps.find(x => x.number && String(x.number) === String(preNum));
+    if(comp) {
+      showBookingPanelFor(comp);
+      delete window.PRESELECT_COMPUTER_ID; delete window.PRESELECT_COMPUTER_NUMBER; delete window.SELECT_COMPUTER_ID;
+    }
+  }
 
+  // скрыть кнопку оплатить до выбора времени
+  const payBtn = el('booking-pay');
+  if(payBtn) payBtn.style.display = 'none';
+};
   // expose util for debug
   window._NB_BOOKING = { refreshBookingsCache, getBookingsCache: ()=> bookingsCache, loadComputers };
 
   // Worker bookings panel (CRUD for bookings)
-  async function renderWorkerBookingsPanel(){
+async function renderWorkerBookingsPanel(){
   const user = (window.AUTH && window.AUTH.getCurrentUser) ? window.AUTH.getCurrentUser() : JSON.parse(localStorage.getItem('nb_user_current')||'null');
   const root = document.getElementById('worker-bookings-root');
   if(!root) return;
-  if(!user || String(user.role).toLowerCase() !== 'worker'){
+  if(!user || (String(user.role).toLowerCase() !== 'worker' && String(user.role).toLowerCase() !== 'admin')){
     root.innerHTML = '<div class="card"><p>Доступно только работникам.</p></div>';
     return;
   }
@@ -412,7 +462,7 @@
 
   const debounce = (fn, ms=300)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), ms); }; };
 
-  // helper parse "HH:MM-HH:MM" -> {start,end} minutes
+  // parse time range
   function parseRange(str){
     if(!str) return null;
     const p = str.split('-');
@@ -424,7 +474,7 @@
     };
     const s = toMin(p[0]); const e = toMin(p[1]);
     if(s===null || e===null) return null;
-    return { start: s, end: e, sStr: p[0], eStr: p[1] };
+    return { start: s, end: e, id:null, sStr: p[0], eStr: p[1] };
   }
   function formatHM(minutes){
     const hh = String(Math.floor(minutes/60)).padStart(2,'0');
@@ -436,23 +486,31 @@
     intervals.sort((a,b)=> a.start - b.start || a.end - b.end);
     const res = [];
     for(const iv of intervals){
-      if(res.length===0){ res.push({start:iv.start,end:iv.end, ids:[iv.id]}); continue; }
+      if(res.length===0){ res.push({start:iv.start,end:iv.end, ids: iv.id ? [iv.id] : []}); continue; }
       const last = res[res.length-1];
-      if(iv.start <= last.end){ if(iv.end > last.end) last.end = iv.end; last.ids = last.ids.concat(iv.id ? [iv.id] : []); }
-      else res.push({start:iv.start,end:iv.end, ids: iv.id ? [iv.id] : []});
+      if(iv.start <= last.end){
+        if(iv.end > last.end) last.end = iv.end;
+        if(iv.id) last.ids.push(iv.id);
+      } else res.push({start:iv.start,end:iv.end, ids: iv.id ? [iv.id] : []});
     }
     res.forEach(r=> r.display = `${formatHM(r.start)}-${formatHM(r.end)}`);
     return res;
   }
 
   async function loadAndRender(){
-    // load all bookings (server preferred)
+    // load bookings (server or local)
     let all = [];
     try{
       const r = await fetch(BOOKINGS_API);
       if(r.ok){ const j = await r.json(); all = j.bookings || []; }
       else all = JSON.parse(localStorage.getItem(BOOKING_STORAGE_KEY)||'[]');
     }catch(e){ all = JSON.parse(localStorage.getItem(BOOKING_STORAGE_KEY)||'[]'); }
+
+    // load computers map for price/type fallback
+    let comps = [];
+    try{ comps = await loadComputers(); }catch(e){ comps = []; }
+    const compByNumber = {};
+    (comps||[]).forEach(c => { if(c && c.number !== undefined) compByNumber[String(c.number)] = c; });
 
     const q = (document.getElementById('wb-search-input').value || '').trim().toLowerCase();
     const list = document.getElementById('wb-list');
@@ -470,28 +528,69 @@
     if(filtered.length === 0){ list.innerHTML = '<p>Ничего не найдено</p>'; return; }
 
     // group by user_login|date|computer
-    const groups = {}; // key -> { user_login, date, computer, intervals: [{start,end,id,timeStr}] }
+    const groups = {};
     filtered.forEach(b=>{
-      const key = `${b.user_login || b.user || b.user_email || 'unknown'}|${b.date}|${b.computer}`;
-      if(!groups[key]) groups[key] = { user: b.user_login || b.user || b.user_email || '', date: b.date, computer: b.computer, intervals: [] };
-      const parsed = parseRange(b.time);
-      if(parsed) groups[key].intervals.push({ start: parsed.start, end: parsed.end, id: b.id });
+      const userKey = b.user_login || b.user || b.user_email || 'unknown';
+      const key = `${userKey}|${b.date}|${b.computer}`;
+      if(!groups[key]) groups[key] = { user: userKey, date: b.date, computer: b.computer, rawBookings: [] };
+      groups[key].rawBookings.push(b);
     });
 
-    // build HTML: for each group, merge intervals and show merged entries
+    // build HTML: for each group, merge intervals and show merged entries + total price
     let html = '';
     Object.keys(groups).sort().forEach(k=>{
       const g = groups[k];
-      const merged = mergeIntervals(g.intervals);
-      // show header for group (user, date, computer)
+
+      // parse intervals from raw bookings
+      const ivs = [];
+      g.rawBookings.forEach(b=>{
+        const parsed = parseRange(b.time);
+        if(parsed){
+          parsed.id = b.id;
+          ivs.push(parsed);
+        }
+      });
+
+      const merged = mergeIntervals(ivs);
+
+      // compute total minutes & total cost for group
+      // We'll compute cost by iterating raw bookings (to respect per-booking price_per_hour)
+      let totalMinutes = 0;
+      let totalCost = 0;
+      g.rawBookings.forEach(b=>{
+        const pr = parseRange(b.time);
+        if(pr){
+          const mins = Math.max(0, pr.end - pr.start);
+          totalMinutes += mins;
+          // determine price_per_hour:
+          let pph = null;
+          if(b.price_per_hour !== undefined && b.price_per_hour !== null) pph = Number(b.price_per_hour);
+          else {
+            const comp = compByNumber[String(b.computer)];
+            if(comp && comp.price !== undefined) pph = Number(comp.price);
+            else {
+              // fallback by type if available
+              if(comp && comp.type === 'vip') pph = PRICE_VIP;
+              else pph = PRICE_REG;
+            }
+          }
+          if(isNaN(pph)) pph = PRICE_REG;
+          totalCost += (mins/60) * pph;
+        }
+      });
+      totalCost = Math.round(totalCost * 100) / 100; // round to 2 decimals
+
+      // header
       html += `<div style="padding:10px;border:1px solid #eee;margin-bottom:8px;border-radius:8px">`;
       html += `<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">`;
       html += `<div><strong>${g.date}</strong> — <strong>ПК ${g.computer}</strong><div style="font-size:13px;color:#555;margin-top:6px">${esc(g.user)}</div></div>`;
+      html += `<div style="text-align:right;color:#333"><div style="font-weight:700">Сумма: ${Number.isInteger(totalCost) ? totalCost + ' ₽' : totalCost.toFixed(2) + ' ₽'}</div></div>`;
       html += `</div>`;
 
-      // each merged interval with delete-all button
+      // each merged interval with delete button
       merged.forEach(m=>{
-        const idsJson = JSON.stringify(m.ids);
+        // collect ids for this merged interval (we collected them when merging)
+        const idsJson = JSON.stringify(m.ids || []);
         html += `<div style="margin-top:8px;padding:8px;border-radius:6px;background:#fafafa;display:flex;justify-content:space-between;align-items:center">`;
         html += `<div><strong>${m.display}</strong></div>`;
         html += `<div style="display:flex;gap:8px"><button class="wb-del close-btn" data-ids='${esc(idsJson)}'>Удалить</button></div>`;
@@ -503,7 +602,7 @@
 
     list.innerHTML = html;
 
-    // bind deletes (delete all ids in group)
+    // bind deletes
     list.querySelectorAll('.wb-del').forEach(btn=>{
       btn.addEventListener('click', async ()=>{
         const raw = btn.getAttribute('data-ids');
@@ -511,7 +610,6 @@
         let ids;
         try{ ids = JSON.parse(raw); }catch(e){ ids = []; }
         if(!confirm('Удалить все записи в этом интервале?')) return;
-        // try API deletes one by one, then reload
         let okCount = 0;
         for(const id of ids){
           try{
@@ -525,7 +623,6 @@
               if(idx>-1){ local.splice(idx,1); localStorage.setItem(BOOKING_STORAGE_KEY, JSON.stringify(local)); okCount++; }
             }
           }catch(e){
-            // ensure local fallback
             const local = JSON.parse(localStorage.getItem(BOOKING_STORAGE_KEY)||'[]');
             const idx = local.findIndex(x=>x.id===id);
             if(idx>-1){ local.splice(idx,1); localStorage.setItem(BOOKING_STORAGE_KEY, JSON.stringify(local)); okCount++; }
@@ -537,17 +634,21 @@
     });
   }
 
-  // helpers for escaping
+  // helpers
   function esc(s){ if(s===null||s===undefined) return ''; return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;'); }
 
-  // wire controls
-  document.getElementById('wb-refresh').addEventListener('click', loadAndRender);
-  document.getElementById('wb-clear').addEventListener('click', ()=>{ document.getElementById('wb-search-input').value=''; loadAndRender(); });
-  document.getElementById('wb-search-input').addEventListener('input', debounce(loadAndRender, 300));
+  // wire controls (note: ensure elements exist)
+  const refreshBtn = document.getElementById('wb-refresh');
+  if(refreshBtn) refreshBtn.addEventListener('click', loadAndRender);
+  const clearBtn = document.getElementById('wb-clear');
+  if(clearBtn) clearBtn.addEventListener('click', ()=>{ const inp=document.getElementById('wb-search-input'); if(inp) inp.value=''; loadAndRender(); });
+  const searchInput = document.getElementById('wb-search-input');
+  if(searchInput) searchInput.addEventListener('input', debounce(loadAndRender, 300));
 
   // initial load
   loadAndRender();
-}
+} // end renderWorkerBookingsPanel
+
 
 
 })();
