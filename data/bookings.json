@@ -503,6 +503,54 @@
             "created_at": "2025-11-17T18:26:51.119Z",
             "price_per_hour": 150,
             "total": 150
+        },
+        {
+            "id": "b_1763409726796_lrtg",
+            "date": "2025-11-18",
+            "computer": "8",
+            "time": "14:00-15:00",
+            "user_login": "vasa",
+            "user_email": "vasakondra@mail.ru",
+            "user_id": "u_1763316051507_vec558",
+            "created_at": "2025-11-17T20:02:06.796Z",
+            "price_per_hour": 150,
+            "total": 150
+        },
+        {
+            "id": "b_1763409726796_4moy",
+            "date": "2025-11-18",
+            "computer": "8",
+            "time": "15:00-16:00",
+            "user_login": "vasa",
+            "user_email": "vasakondra@mail.ru",
+            "user_id": "u_1763316051507_vec558",
+            "created_at": "2025-11-17T20:02:06.796Z",
+            "price_per_hour": 150,
+            "total": 150
+        },
+        {
+            "id": "b_1763409981108_zgyc",
+            "date": "2025-11-18",
+            "computer": "7",
+            "time": "22:00-23:00",
+            "user_login": "nativelog228",
+            "user_email": "help_1994@inbox.ru",
+            "user_id": "u_1763409909155_8nw409",
+            "created_at": "2025-11-17T20:06:21.109Z",
+            "price_per_hour": 250,
+            "total": 250
+        },
+        {
+            "id": "b_1763409981109_6qjb",
+            "date": "2025-11-18",
+            "computer": "7",
+            "time": "23:00-24:00",
+            "user_login": "nativelog228",
+            "user_email": "help_1994@inbox.ru",
+            "user_id": "u_1763409909155_8nw409",
+            "created_at": "2025-11-17T20:06:21.109Z",
+            "price_per_hour": 250,
+            "total": 250
         }
     ]
 }

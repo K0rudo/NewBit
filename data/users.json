@@ -41,6 +41,13 @@
             "login": "Леша",
             "password": "1",
             "role": "user"
+        },
+        {
+            "id": "u_1763409909155_8nw409",
+            "email": "help_1994@inbox.ru",
+            "login": "nativelog228",
+            "password": "1",
+            "role": "user"
         }
     ]
 }

@@ -105,85 +105,14 @@ broni: `
 `,
 
 
-    analiz: `
-      <div class="card">
-  <h2>Отчёты</h2>
-  <label for="rep-type">Тип отчёта</label>
-  <select id="rep-type">
-    <option value="list">Список бронирований</option>
-    <option value="income">Доходы по компьютерам</option>
-    <option value="used">Самые используемые компьютеры</option>
-    <option value="user">Бронирования по пользователям</option>
-  </select>
+analiz: `
+  <div class="card">
+    <h2>Отчёты</h2>
+    <!-- Плейсхолдер для компактной панели и таблиц (вставляет js/analiz.js) -->
+    <div id="analiz-root"></div>
+  </div>
+`,
 
-  <label for="rep-computer">Компьютер</label>
-  <select id="rep-computer">
-    <option value="all">Все</option>
-    <option value="1">1</option>
-    <option value="2">2</option>
-    <option value="3">3</option>
-    <option value="4">4</option>
-    <option value="5">5</option>
-    <option value="6">6</option>
-    <option value="7">7</option>
-    <option value="8">8</option>
-    <option value="9">9</option>
-    <option value="10">10</option>
-  </select>
-
-  <label for="rep-start">Дата начала</label>
-  <input type="date" id="rep-start">
-
-  <label for="rep-end">Дата окончания</label>
-  <input type="date" id="rep-end">
-
-  <button id="rep-gen">Сформировать</button>
-
-  <!-- Таблица списка бронирований -->
-  <table class="report-table" id="rep-table">
-    <thead>
-      <tr><th>Дата</th><th>Компьютер</th><th>Часы</th><th>Пользователь</th></tr>
-    </thead>
-    <tbody></tbody>
-    <tfoot>
-      <tr><td colspan="3">Итого брони</td><td id="rep-count">0</td></tr>
-    </tfoot>
-  </table>
-
-  <!-- Таблица доходов по компьютерам -->
-  <table class="report-table" id="rep-table-income" style="display:none;">
-    <thead>
-      <tr><th>Компьютер</th><th>Часы</th><th>Ставка</th><th>Доход</th></tr>
-    </thead>
-    <tbody></tbody>
-    <tfoot>
-      <tr><td colspan="3">Итого доход</td><td id="income-total">0</td></tr>
-    </tfoot>
-  </table>
-
-  <!-- Таблица самых используемых компьютеров -->
-  <table class="report-table" id="rep-table-used" style="display:none;">
-    <thead>
-      <tr><th>Компьютер</th><th>Часы</th></tr>
-    </thead>
-    <tbody></tbody>
-    <tfoot>
-      <tr><td>Всего часов</td><td id="used-total">0</td></tr>
-    </tfoot>
-  </table>
-
-  <!-- Таблица бронирований по пользователям -->
-  <table class="report-table" id="rep-table-user" style="display:none;">
-    <thead>
-      <tr><th>Пользователь</th><th>Бронирования</th></tr>
-    </thead>
-    <tbody></tbody>
-    <tfoot>
-      <tr><td>Итого бронирований</td><td id="user-total">0</td></tr>
-    </tfoot>
-  </table>
-</div>
-    `,
 
     equioment: `
   <div class="card">

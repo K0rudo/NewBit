@@ -119,6 +119,18 @@ function renderDetails(c){
 
   // bind book
   const bookBtn = $id('btn-book');
+  // === Блокировка бронирования, если компьютер сломан ===
+if (c.type === 'broken') {
+
+  if (bookBtn) {
+    bookBtn.disabled = true;
+    bookBtn.style.opacity = "0.5";
+    bookBtn.style.pointerEvents = "none";
+    bookBtn.style.cursor = "not-allowed";
+    bookBtn.textContent = "Недоступно (ремонт)";
+  }
+
+}
   if(bookBtn){
     bookBtn.addEventListener('click', ()=>{
       window.PRESELECT_COMPUTER_ID = c.id;
