@@ -75,7 +75,9 @@
         if(serverUsers){
           const found = serverUsers.find(u => (u.login === ident || u.email === ident) && u.password === pass);
           if(found){
-            window.AUTH.setCurrentUser({ id: found.id, email: found.email, login: found.login });
+            // используем роль, если есть, иначе ставим 'user' по умолчанию
+            const role = (found.role && String(found.role).trim()) ? String(found.role) : 'user';
+            window.AUTH.setCurrentUser({ id: found.id, email: found.email, login: found.login, role: role });
             showMsg('login-message','Вход успешен','success');
             setTimeout(()=> location.hash = '#/', 400);
             return;
@@ -86,7 +88,8 @@
         const locals = loadLocalUsers();
         const found = locals.find(u => (u.login === ident || u.email === ident) && u.password === pass);
         if(found){
-          window.AUTH.setCurrentUser({ id: found.id, email: found.email, login: found.login });
+          const role = (found.role && String(found.role).trim()) ? String(found.role) : 'user';
+          window.AUTH.setCurrentUser({ id: found.id, email: found.email, login: found.login, role: role });
           showMsg('login-message','Вход успешен (локально)','success');
           setTimeout(()=> location.hash = '#/', 400);
           return;
@@ -117,11 +120,12 @@
             showMsg('reg-message','Пользователь с таким email или логином уже существует','error'); return;
           }
 
-          const newUser = { id: 'u_' + Date.now() + '_' + Math.random().toString(36).slice(2,8), email: e, login: l, password: p };
+          // Добавляем роль 'user' по умолчанию при регистрации
+          const newUser = { id: 'u_' + Date.now() + '_' + Math.random().toString(36).slice(2,8), email: e, login: l, password: p, role: 'user' };
           users.push(newUser);
           localStorage.setItem('nb_users_local', JSON.stringify(users));
 
-          window.AUTH.setCurrentUser({ id: newUser.id, email: newUser.email, login: newUser.login });
+          window.AUTH.setCurrentUser({ id: newUser.id, email: newUser.email, login: newUser.login, role: newUser.role });
           showMsg('reg-message','Регистрация успешна (локально)','success');
           setTimeout(()=> location.hash = '#/', 600);
         });

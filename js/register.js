@@ -53,7 +53,7 @@
       if(existsUser(users, e, l)){ show('Пользователь с таким email или логином уже существует', 'error'); return; }
 
       // prepare user object (store password as plain for dev; in real — хешировать)
-      const newUser = { id: 'u_' + Date.now() + '_' + Math.random().toString(36).slice(2,8), email: e, login: l, password: p };
+      const newUser = { id: 'u_' + Date.now() + '_' + Math.random().toString(36).slice(2,8), email: e, login: l, password: p, role: 'user' };
 
       // try server first
       const serverOk = await tryServerAdd(newUser);

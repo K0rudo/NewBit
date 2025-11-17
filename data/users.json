@@ -4,19 +4,36 @@
             "id": "u_example",
             "email": "demo@example.com",
             "login": "demo",
-            "password": "demo123"
+            "password": "demo123",
+            "role": "user"
         },
         {
             "id": "u_1763316051507_vec558",
             "email": "vasakondra@mail.ru",
             "login": "vasa",
-            "password": "111"
+            "password": "111",
+            "role": "user"
         },
         {
             "id": "u_1763330324180_ixdvaf",
             "email": "admin@admin.ru",
             "login": "admin",
-            "password": "admin"
+            "password": "admin",
+            "role": "worker"
+        },
+        {
+            "id": "u_1763383069283_be3twl",
+            "email": "worker@worker.ru",
+            "login": "worker",
+            "password": "worker",
+            "role": "worker"
+        },
+        {
+            "id": "u_1763391527002_ycra8g",
+            "email": "i@mail.ru",
+            "login": "1",
+            "password": "1",
+            "role": "user"
         }
     ]
 }

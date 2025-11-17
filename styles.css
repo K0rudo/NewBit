@@ -14,7 +14,7 @@ nav a.active{outline:2px solid rgba(255,255,255,0.12);background:rgba(255,255,25
 .card{background:#fff;border-radius:10px;padding:18px;box-shadow:0 6px 18px rgba(0,0,0,0.06);margin-bottom:18px}
 .h2{font-size:20px;margin:0 0 12px}
 label{display:block;font-weight:700;margin:8px 0 6px}
-input[type="text"],input[type="date"],select,button{padding:10px;border:1px solid #ddd;border-radius:6px;width:100%;font-size:15px}
+input[type="text"],input[type="date"],select,button,textarea{padding:10px;border:1px solid #ddd;border-radius:6px;width:100%;font-size:15px}
 button{background:var(--primary);color:#fff;border:none;cursor:pointer}
 button.secondary{background:#6c757d}
 .legend{display:flex;gap:12px;align-items:center;margin:12px 0}
@@ -150,8 +150,6 @@ nav a{margin-left:6px;padding:6px 8px}}
   box-sizing: border-box;
 }
 
-
-
 /* доступный слот — нейтральный (фон белый остаётся, но не изменяется при hover) */
 .time-slot.available {
   background: #fff;
@@ -172,4 +170,187 @@ nav a{margin-left:6px;padding:6px 8px}}
   border-color: #f5c6cb;
   color: #721c24;
   cursor: not-allowed;
+}
+
+/* === Equipment page styles (cards, tabs, modal) === */
+.tabs { display:flex; justify-content:center; margin:20px 0; gap:10px; }
+.tab-button { padding:10px 18px; border:none; background:#007bff; color:#fff; cursor:pointer; border-radius:6px; font-size:15px; }
+.tab-button.active { background:#0056b3; }
+.tab-content { display:none; padding:6px 0 0 0; }
+.tab-content.active { display:block; }
+
+.equipment-list { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:16px; margin-top:12px; }
+
+/* карточка ПК */
+.pc-card {
+  background:#fff; border-radius:10px; box-shadow:0 6px 18px rgba(0,0,0,0.06);
+  padding:14px; position:relative; text-align:left; overflow:hidden;
+}
+.pc-card img { width:100%; height:200px; object-fit:cover; border-radius:8px; display:block; margin-bottom:10px; }
+.pc-card h3 { margin:6px 0 8px 0; font-size:18px; }
+.pc-card p { margin:6px 0; font-size:14px; color:#222; }
+.pc-card .meta { font-size:13px; color:#555; }
+.pc-card .price { font-weight:700; margin-top:8px; }
+
+/* кнопка редактирования */
+.pc-card .edit-btn {
+  position:absolute; top:10px; right:10px; background:#28a745; color:#fff; border:none; padding:6px 10px; border-radius:6px; cursor:pointer;
+}
+.pc-card .edit-btn:hover { background:#218838; }
+
+/* modal */
+.modal-overlay {
+  position:fixed; left:0; top:0; width:100%; height:100%; background: rgba(0,0,0,0.5);
+  display:none; align-items:center; justify-content:center; z-index:1200;
+}
+.modal-overlay.active { display:flex; }
+.modal {
+  background:#fff; border-radius:10px; width: min(680px, 96%); padding:18px; box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+.modal h2 { margin:0 0 8px 0; text-align:center; }
+.modal label { display:block; margin-top:10px; font-weight:700; font-size:14px; }
+.modal input[type="text"], .modal input[type="number"], .modal textarea, .modal select {
+  width:100%; padding:8px; margin-top:6px; box-sizing:border-box; border-radius:6px; border:1px solid #ddd;
+}
+
+/* кнопки внутри модального */
+.save-btn { background:#007bff; color:#fff; padding:8px 14px; border-radius:6px; border:none; cursor:pointer; }
+.close-btn { background:#6c757d; color:#fff; padding:8px 14px; border-radius:6px; border:none; cursor:pointer; }
+.save-btn:hover { background:#0056b3; }
+.close-btn:hover { background:#5a6268; }
+
+@media (max-width:600px){
+  .modal { padding:12px; }
+  .pc-card img { height:160px; }
+}
+
+/* horizontal scrollbar of computers */
+.computers-scroll-wrap { overflow:hidden; padding:8px 0; }
+.computers-scroll {
+  display:flex;
+  gap:10px;
+  overflow-x:auto;
+  padding:8px;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+.comp-tile {
+  min-width:88px;
+  min-height:88px;
+  border-radius:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:700;
+  color:#fff;
+  cursor:pointer;
+  padding:10px;
+  flex:0 0 auto;
+  box-shadow:0 4px 10px rgba(0,0,0,0.08);
+  user-select:none;
+}
+.comp-tile.regular { background: linear-gradient(180deg,#2b8cff,#007bff); } /* blue */
+.comp-tile.vip { background: linear-gradient(180deg,#28a745,#1e7e34); } /* green */
+.comp-tile.broken { background: linear-gradient(180deg,#dc3545,#b02a37); } /* red */
+.comp-tile.active { outline:3px solid rgba(255,255,255,0.12); transform:translateY(-4px); }
+
+/* details area */
+#equip-details .card { margin-top:8px; }
+
+/* make modal inputs nice */
+#equip-form input[disabled], #equip-form textarea[disabled] { background:#f8f9fa; color:#333; }
+.modal .save-btn { background:#007bff; color:#fff; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; }
+.modal .close-btn { background:#6c757d; color:#fff; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; }
+
+/* details area under scroll */
+#equip-details .card { padding:12px; }
+#booking-comp-details { margin-top:10px; }
+/* search in worker bookings */
+.wb-search {
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+.wb-search input[type="search"]{
+  padding:8px 36px 8px 12px;
+  border:1px solid #ddd;
+  border-radius:8px;
+  font-size:14px;
+  width:260px;
+  background: white url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"><path fill="%23888" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l4.25 4.25c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41L15.5 14zm-6 0C7 14 5 12 5 9.5S7 5 9.5 5 14 7 14 9.5 12 14 9.5 14z"/></svg>') no-repeat right 8px center;
+  background-size:14px;
+}
+.wb-search .clear-btn{
+  border:none;background:#f1f1f1;padding:6px 8px;border-radius:6px;cursor:pointer;
+}
+.wb-search .clear-btn:hover{background:#e2e2e2}
+
+/* tabs for broni — inactive is gray, active is primary */
+.broni-tabs { display:flex; gap:8px; margin:12px 0; }
+.broni-tab {
+  padding:8px 14px;
+  border-radius:8px;
+  background:#e0e0e0;      /* <--- серый для неактивной */
+  color:#222;
+  border:1px solid #cfcfcf;
+  cursor:pointer;
+  transition: background .12s ease, color .12s ease, transform .08s ease;
+}
+.broni-tab:hover { transform: translateY(-2px); }
+.broni-tab.active {
+  background:var(--primary);
+  color:#fff;
+  border-color:transparent;
+}
+
+/* ===== Make equipment image fill full height of the details form/card ===== */
+
+/* Ensure the details card stretches children to equal height */
+#equip-details .card {
+  display: flex;              /* side-by-side layout: image + content */
+  gap: 12px;
+  align-items: stretch;       /* make left column stretch to card height */
+  padding: 12px;
+}
+
+/* Left column which contains the image — make it a flex column so image can stretch */
+#equip-details .card > div:first-child {
+  flex: 0 0 40%;              /* image column width: 40% (changeable) */
+  min-width: 240px;
+  display: flex;
+  align-items: stretch;       /* allow the child <img> to stretch vertically */
+}
+
+/* Make the image take the full height of its column */
+#equip-details .card > div:first-child img,
+#equip-details img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;          /* crop/cover without distortion */
+  border-radius: 8px;
+  display: block;
+}
+
+/* Content column: take remaining space */
+#equip-details .card > div:nth-child(2) {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* For very narrow screens, stack vertically but keep image reasonably tall */
+@media (max-width:900px) {
+  #equip-details .card {
+    flex-direction: column;
+  }
+  #equip-details .card > div:first-child {
+    flex: 0 0 auto;
+    min-width: 0;
+    height: 320px; /* make image still tall on tablet/mobile */
+  }
+  #equip-details .card > div:first-child img { height: 100%; }
+}
+
+@media (max-width:480px) {
+  #equip-details .card > div:first-child { height: 220px; }
 }

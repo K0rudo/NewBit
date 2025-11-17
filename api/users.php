@@ -1,5 +1,5 @@
 <?php
-// api/users.php
+// api/users.php  (обновлённая версия: поддержка role)
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
@@ -28,6 +28,17 @@ function write_data($file, $data) {
 $method = $_SERVER['REQUEST_METHOD'];
 $input = json_decode(file_get_contents('php://input'), true);
 
+function normalize_user($u){
+    return [
+        'id' => isset($u['id']) ? (string)$u['id'] : null,
+        'email' => isset($u['email']) ? (string)$u['email'] : '',
+        'login' => isset($u['login']) ? (string)$u['login'] : '',
+        'password' => isset($u['password']) ? (string)$u['password'] : '',
+        // NEW: role (worker|user)
+        'role' => isset($u['role']) ? (string)$u['role'] : 'user'
+    ];
+}
+
 if($method === 'GET'){
     $j = read_data($FILE);
     echo json_encode($j, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
@@ -48,33 +59,37 @@ if($method === 'POST'){
         if(!isset($u['email'])) $u['email'] = '';
         if(!isset($u['login'])) $u['login'] = '';
         if(!isset($u['password'])) $u['password'] = '';
-        // check duplicates
+        // default role 'user' (unless provided)
+        $u['role'] = isset($u['role']) ? (string)$u['role'] : 'user';
+
         foreach($j['users'] as $ex){
             if(strtolower($ex['email']) === strtolower($u['email']) || strtolower($ex['login']) === strtolower($u['login'])){
                 echo json_encode(['success'=>false,'error'=>'exists']);
                 exit;
             }
         }
-        $j['users'][] = $u;
+        $j['users'][] = normalize_user($u);
         write_data($FILE, $j);
         echo json_encode(['success'=>true]);
         exit;
     }
-    // fallback if direct user object posted
+    // fallback: direct posting of user object
     if(isset($input['email']) && isset($input['login']) && isset($input['password'])){
         $u = $input;
         if(!isset($u['id'])) $u['id'] = 'u_'.time().'_'.bin2hex(random_bytes(4));
+        $u['role'] = isset($u['role']) ? (string)$u['role'] : 'user';
         foreach($j['users'] as $ex){
             if(strtolower($ex['email']) === strtolower($u['email']) || strtolower($ex['login']) === strtolower($u['login'])){
                 echo json_encode(['success'=>false,'error'=>'exists']);
                 exit;
             }
         }
-        $j['users'][] = $u;
+        $j['users'][] = normalize_user($u);
         write_data($FILE, $j);
         echo json_encode(['success'=>true,'id'=>$u['id']]);
         exit;
     }
+
     echo json_encode(['success'=>false,'error'=>'invalid_input']);
     exit;
 }

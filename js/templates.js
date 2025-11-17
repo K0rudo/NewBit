@@ -15,40 +15,52 @@ broni: `
   <div class="card">
     <h2>Бронирование компьютера</h2>
 
-    <p>Выберите компьютер в сетке ниже:</p>
-    <div id="computers-grid" class="computers-grid" aria-live="polite"></div>
+    <div class="broni-tabs" role="tablist" aria-label="Бронирование и управление">
+      <button class="broni-tab active" data-tab="tab-book">Бронь</button>
+      <button class="broni-tab" data-tab="tab-manage">Управление бронями</button>
+    </div>
 
-    <!-- Панель бронирования (фикс. размер, показывается после клика по компьютеру) -->
-    <div id="booking-panel" class="card" style="margin-top:16px; display:none;">
-      <h3 id="booking-title">Бронирование</h3>
+    <div id="tab-book" class="broni-panel active">
+      <p>Выберите компьютер в сетке ниже:</p>
+      <div id="computers-grid" class="computers-grid" aria-live="polite"></div>
 
-      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
-        <div style="flex:1;min-width:220px">
-          <label for="booking-date">Дата</label>
-          <input type="date" id="booking-date">
+      <!-- Панель бронирования (фикс. размер, показывается после клика по компьютеру) -->
+      <div id="booking-panel" class="card" style="margin-top:16px; display:none;">
+        <h3 id="booking-title">Бронирование</h3>
+
+        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+          <div style="flex:1;min-width:220px">
+            <label for="booking-date">Дата</label>
+            <input type="date" id="booking-date">
+          </div>
+
+          <div style="min-width:160px">
+            <label>&nbsp;</label>
+            <button id="equip-link" class="secondary">Посмотреть характеристики</button>
+          </div>
         </div>
 
-        <div style="min-width:160px">
-          <label>&nbsp;</label>
-          <button id="equip-link" class="secondary">Посмотреть характеристики</button>
+        <label style="margin-top:12px">Временные интервалы (прокрутите и выберите):</label>
+        <div id="booking-times" class="time-slots scrollable-times" aria-live="polite"></div>
+
+        <div id="booking-message" style="margin-top:8px"></div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;">
+          <div>
+            <div>Общая стоимость: <strong id="booking-total">0 руб.</strong></div>
+            <div style="font-size:13px;color:#666">Обычный — 150 ₽/ч, VIP — 250 ₽/ч</div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button id="booking-cancel" class="secondary">Отмена</button>
+            <button id="booking-pay">Оплатить</button>
+          </div>
         </div>
       </div>
+    </div>
 
-      <label style="margin-top:12px">Временные интервалы (прокрутите и выберите):</label>
-      <div id="booking-times" class="time-slots scrollable-times" aria-live="polite"></div>
-
-      <div id="booking-message" style="margin-top:8px"></div>
-
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;">
-        <div>
-          <div>Общая стоимость: <strong id="booking-total">0 руб.</strong></div>
-          <div style="font-size:13px;color:#666">Обычный — 150 ₽/ч, VIP — 250 ₽/ч</div>
-        </div>
-        <div style="display:flex;gap:8px">
-          <button id="booking-cancel" class="secondary">Отмена</button>
-          <button id="booking-pay">Оплатить</button>
-        </div>
-      </div>
+    <div id="tab-manage" class="broni-panel" style="display:none;">
+      <!-- Контент для worker: поиск + список броней -->
+      <div id="worker-bookings-root"></div>
     </div>
   </div>
 `,
@@ -85,15 +97,65 @@ broni: `
     `,
 
     equioment: `
-      <div class="card">
-        <h2>Оборудование</h2>
-        <p>Ниже — фотографии оборудования (1.jpg и 2.jpg из репозитория)</p>
-        <div class="equipment-grid">
-          <img src="img/1.jpg" alt="Оборудование 1">
-          <img src="img/2.jpg" alt="Оборудование 2">
+  <div class="card">
+    <h2>Оборудование</h2>
+
+    <div class="computers-scroll-wrap">
+      <div id="computers-scroll" class="computers-scroll" tabindex="0" aria-label="Список компьютеров"></div>
+    </div>
+
+    <div id="equip-controls" style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;gap:12px">
+      <div id="equip-add-area"></div> <!-- <-- сюда переместили кнопку "Добавить" -->
+      <div id="equip-search-area" style="margin-left:auto"></div>
+    </div>
+
+    <div id="equip-details" style="margin-top:18px;"></div>
+  </div>
+
+  <!-- modal for edit/add -->
+  <div id="equip-modal" class="modal-overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="equip-modal-title">
+      <h2 id="equip-modal-title">Компьютер</h2>
+      <form id="equip-form" onsubmit="return false;">
+        <label>Номер</label>
+        <input id="equip-number" type="number" disabled>
+
+        <label>Метка</label>
+        <input id="equip-label" type="text">
+
+        <label>Процессор</label>
+        <input id="equip-processor" type="text">
+
+        <label>Видеокарта</label>
+        <input id="equip-gpu" type="text">
+
+        <label>ОЗУ</label>
+        <input id="equip-ram" type="text">
+
+        <label>Накопитель</label>
+        <input id="equip-storage" type="text">
+
+        <label>Монитор</label>
+        <input id="equip-monitor" type="text">
+
+        <label>Цена (руб/час)</label>
+        <input id="equip-price" type="number" min="0">
+
+        <label>Примечания</label>
+        <textarea id="equip-notes" rows="4" style="width:100%"></textarea>
+
+        <input type="hidden" id="equip-id">
+
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+          <button type="button" id="equip-save" class="save-btn" style="display:none">Сохранить</button>
+          <button type="button" id="equip-delete" class="close-btn" style="display:none">Удалить</button>
+          <button type="button" id="equip-close" class="close-btn">Закрыть</button>
         </div>
-      </div>
-    `,
+      </form>
+    </div>
+  </div>
+`,
+
 
     /* Страница регистрации */
     register: `

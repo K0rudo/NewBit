@@ -1,7 +1,5 @@
 <?php
-// api/bookings.php
-// Dev API для бронирований c проверкой дублей по (date, computer, time)
-
+// api/bookings.php (обновлённая версия — сохраняет price_per_hour)
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Accept');
@@ -10,7 +8,6 @@ header('Content-Type: application/json; charset=utf-8');
 
 $DATA_DIR = __DIR__ . '/../data';
 $FILE = $DATA_DIR . '/bookings.json';
-
 if (!is_dir($DATA_DIR)) mkdir($DATA_DIR, 0755, true);
 if (!file_exists($FILE)) file_put_contents($FILE, json_encode(['bookings'=>[]], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);
 
@@ -18,7 +15,7 @@ function read_data($file) {
     $s = @file_get_contents($file);
     if ($s === false || $s === '') return ['bookings'=>[]];
     $j = json_decode($s, true);
-    if (!is_array($j) || !isset($j['bookings']) || !is_array($j['bookings'])) return ['bookings'=>[]];
+    if (!is_array($j) || !isset($j['bookings'])) return ['bookings'=>[]];
     return $j;
 }
 function write_data($file, $data) {
@@ -42,13 +39,15 @@ function normalize_booking($b){
     $out['user_email'] = isset($b['user_email']) ? (string)$b['user_email'] : '';
     $out['user_id'] = isset($b['user_id']) ? (string)$b['user_id'] : '';
     $out['created_at'] = isset($b['created_at']) ? (string)$b['created_at'] : null;
+    $out['price_per_hour'] = isset($b['price_per_hour']) ? $b['price_per_hour'] : null;
+    $out['total'] = isset($b['total']) ? $b['total'] : null;
     return $out;
 }
 
 $method = $_SERVER['REQUEST_METHOD'];
 parse_str($_SERVER['QUERY_STRING'] ?? '', $qs);
 
-// GET
+// GET -> return all bookings
 if ($method === 'GET') {
     $j = read_data($FILE);
     respond($j);
@@ -62,7 +61,7 @@ if ($method === 'POST') {
 
     $data = read_data($FILE);
     $added = [];
-    $skipped = []; // дубликаты
+    $skipped = [];
 
     if (isset($input['action']) && $input['action'] === 'add' && isset($input['bookings']) && is_array($input['bookings'])) {
         foreach ($input['bookings'] as $b) {
@@ -70,7 +69,7 @@ if ($method === 'POST') {
             if (!$nb['id']) $nb['id'] = 'b_'.time().'_'.bin2hex(random_bytes(4));
             if (!$nb['created_at']) $nb['created_at'] = gmdate('c');
 
-            // проверка дубликата: существует запись с тем же date, computer, time
+            // check duplicates
             $is_dup = false;
             foreach ($data['bookings'] as $exist){
                 if (isset($exist['date']) && isset($exist['computer']) && isset($exist['time'])) {
@@ -82,6 +81,22 @@ if ($method === 'POST') {
                 }
             }
             if ($is_dup) continue;
+
+            // compute total if not provided and price_per_hour provided (time in format HH:MM-HH:MM)
+            if ($nb['total'] === null && $nb['price_per_hour'] !== null && $nb['time']){
+                $parts = explode('-', $nb['time']);
+                if(count($parts)===2){
+                    list($s,$e) = $parts;
+                    $sh = intval(substr($s,0,2)); $sm = intval(substr($s,3,2));
+                    $eh = intval(substr($e,0,2)); $em = intval(substr($e,3,2));
+                    $minutes = ($eh*60+$em) - ($sh*60+$sm);
+                    if($minutes>0){
+                        $hours = $minutes / 60.0;
+                        $nb['total'] = $hours * floatval($nb['price_per_hour']);
+                    }
+                }
+            }
+
             $data['bookings'][] = $nb;
             $added[] = $nb['id'];
         }
@@ -89,12 +104,11 @@ if ($method === 'POST') {
         respond(['success'=>true,'added'=>$added,'skipped'=>$skipped]);
     }
 
-    // одиночный объект
+    // single booking fallback
     if (isset($input['date']) && isset($input['computer']) && isset($input['time'])) {
         $nb = normalize_booking($input);
         if (!$nb['id']) $nb['id'] = 'b_'.time().'_'.bin2hex(random_bytes(4));
         if (!$nb['created_at']) $nb['created_at'] = gmdate('c');
-        // проверка дубликата
         foreach ($data['bookings'] as $exist){
             if ($exist['date'] === $nb['date'] && (string)$exist['computer'] === (string)$nb['computer'] && $exist['time'] === $nb['time']) {
                 respond(['success'=>false,'error'=>'duplicate','existing_id'=>$exist['id'] ?? null], 409);
@@ -108,7 +122,7 @@ if ($method === 'POST') {
     respond(['success'=>false,'error'=>'invalid_input'], 400);
 }
 
-// DELETE
+// DELETE -> delete by id
 if ($method === 'DELETE') {
     $id = $qs['id'] ?? null;
     if (!$id) respond(['success'=>false,'error'=>'no_id'], 400);
@@ -130,3 +144,5 @@ if ($method === 'DELETE') {
 }
 
 respond(['success'=>false,'error'=>'method_not_allowed'], 405);
+exit;
+?>
