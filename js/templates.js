@@ -80,8 +80,12 @@ broni: `
         </div>
 
         <label style="margin-top:12px">Временные интервалы (прокрутите и выберите):</label>
-        <div id="booking-times" class="time-slots scrollable-times" aria-live="polite"></div>
 
+        <div id="booking-times" class="time-slots scrollable-times" aria-live="polite"></div>
+        <div id="booking-legend" style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+          <div style="width:16px; height:16px; background:#f8d7da; border:1px solid #f5c6cb; border-radius:4px;"></div>
+          <span>Занято</span>
+        </div>
         <div id="booking-message" style="margin-top:8px"></div>
 
         <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;">

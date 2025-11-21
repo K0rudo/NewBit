@@ -202,6 +202,9 @@ if (cancelBtn) cancelBtn.onclick = ()=> {
       if(d < today){ showMessage('booking-message','Нельзя выбрать прошедшую дату','error'); return; }
       renderTimeSlotsFor(dateInput.value);
     };
+
+
+    
     updateBookingTotal();
   }
 

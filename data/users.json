@@ -48,6 +48,13 @@
             "login": "nativelog228",
             "password": "1",
             "role": "user"
+        },
+        {
+            "id": "u_1763433359892_25124t",
+            "email": "antonvolckov78@gmail.com",
+            "login": "Batya",
+            "password": "1234",
+            "role": "user"
         }
     ]
 }

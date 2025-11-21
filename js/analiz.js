@@ -12,7 +12,11 @@
   function $id(id){ return document.getElementById(id); }
   function el(tag, props){ const e = document.createElement(tag); if(props) Object.keys(props).forEach(k=>{ if(k==='text') e.textContent = props[k]; else e.setAttribute(k, props[k]); }); return e; }
   function safeParse(s, fallback){ try{ return JSON.parse(s); } catch(e){ return fallback; } }
-  function fmtMoney(v){ if(v===null||v===undefined||isNaN(Number(v))) return '0 ₽'; const n = Number(v); return Number.isInteger(n) ? `${n} ₽` : `${n.toFixed(2)} ₽`; }
+function fmtMoney(v){
+  if(v===null||v===undefined||isNaN(Number(v))) return '0';
+  const n = Number(v);
+  return Number.isInteger(n) ? `${n}` : `${n.toFixed(2)}`;
+}
   function esc(s){ if(s===null||s===undefined) return ''; return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;'); }
 
   // parse time "HH:MM-HH:MM"
@@ -231,7 +235,7 @@
       // --- LIST ---
       if(type === 'list'){
         panel.msg.textContent = '';
-        const headers = ['Дата','Компьютер','Время','Часы','Пользователь','Итого'];
+        const headers = ['Дата','Компьютер','Время','Часы','Пользователь','Итого, ₽'];
         const tbl = makeTable(headers, 'rep-table');
         // group by user|date|comp
         const groups = {};
@@ -287,7 +291,8 @@
           tbl.tbody.appendChild(tr);
         });
 
-        tbl.tfoot.innerHTML = `<tr><td colspan="5">Итого (сумма)</td><td>${fmtMoney(Math.round(totalSum*100)/100)}</td></tr>`;
+        tbl.tfoot.innerHTML = `<tr><td colspan="5"><strong>Итого (сумма)</strong></td><td><strong>${fmtMoney(Math.round(totalSum*100)/100)}</strong></td></tr>`;
+
         panel.wrapList.appendChild(tbl.table);
         return;
       }
@@ -295,7 +300,7 @@
       // --- INCOME ---
       if(type === 'income'){
         panel.msg.textContent = '';
-        const headers = ['Компьютер','Часы','Ставка','Итого'];
+        const headers = ['Компьютер','Часы','Ставка','Итого, ₽'];
         const tbl = makeTable(headers, 'rep-table-income');
         const byComp = {};
         filtered.forEach(b => {
@@ -322,10 +327,12 @@
           const income = Math.round(r.income*100)/100;
           totalIncome += income;
           const tr = el('tr');
-          tr.innerHTML = `<td>${esc(r.comp)}</td><td>${hours}</td><td>${avg.toFixed(2)} ₽</td><td>${fmtMoney(income)}</td>`;
+          tr.innerHTML = `<td>${esc(r.comp)}</td><td>${hours}</td><td>${avg.toFixed(2)} </td><td>${fmtMoney(income)}</td>`;
           tbl.tbody.appendChild(tr);
         });
-        tbl.tfoot.innerHTML = `<tr><td colspan="3">Итого доход</td><td>${fmtMoney(Math.round(totalIncome*100)/100)}</td></tr>`;
+        tbl.tfoot.innerHTML = `<tr><td colspan="3"><strong>Итого доход</strong></td><td><strong>${fmtMoney(Math.round(totalIncome*100)/100)}</strong></td></tr>`;
+
+
         panel.wrapIncome.appendChild(tbl.table);
         return;
       }
@@ -379,9 +386,8 @@
     });
 
     // итог тоже по новому порядку
-    tbl.tfoot.innerHTML = `
-        <tr><td colspan="2">Итого (часы)</td><td>${totalHours}</td></tr>
-    `;
+    tbl.tfoot.innerHTML = `<tr><td colspan="2"><strong>Итого (часы)</strong></td><td><strong>${totalHours}</strong></td></tr>`;
+
 
     panel.wrapUser.appendChild(tbl.table);
     return;

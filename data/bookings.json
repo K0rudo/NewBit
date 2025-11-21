@@ -551,6 +551,102 @@
             "created_at": "2025-11-17T20:06:21.109Z",
             "price_per_hour": 250,
             "total": 250
+        },
+        {
+            "id": "b_1763433402942_bl4i",
+            "date": "2025-11-18",
+            "computer": "1",
+            "time": "08:00-09:00",
+            "user_login": "Batya",
+            "user_email": "antonvolckov78@gmail.com",
+            "user_id": "u_1763433359892_25124t",
+            "created_at": "2025-11-18T02:36:42.942Z",
+            "price_per_hour": 150,
+            "total": 150
+        },
+        {
+            "id": "b_1763433402942_20pt",
+            "date": "2025-11-18",
+            "computer": "1",
+            "time": "09:00-10:00",
+            "user_login": "Batya",
+            "user_email": "antonvolckov78@gmail.com",
+            "user_id": "u_1763433359892_25124t",
+            "created_at": "2025-11-18T02:36:42.942Z",
+            "price_per_hour": 150,
+            "total": 150
+        },
+        {
+            "id": "b_1763433402942_6gj4",
+            "date": "2025-11-18",
+            "computer": "1",
+            "time": "10:00-11:00",
+            "user_login": "Batya",
+            "user_email": "antonvolckov78@gmail.com",
+            "user_id": "u_1763433359892_25124t",
+            "created_at": "2025-11-18T02:36:42.942Z",
+            "price_per_hour": 150,
+            "total": 150
+        },
+        {
+            "id": "b_1763433402942_60g1",
+            "date": "2025-11-18",
+            "computer": "1",
+            "time": "11:00-12:00",
+            "user_login": "Batya",
+            "user_email": "antonvolckov78@gmail.com",
+            "user_id": "u_1763433359892_25124t",
+            "created_at": "2025-11-18T02:36:42.942Z",
+            "price_per_hour": 150,
+            "total": 150
+        },
+        {
+            "id": "b_1763438056605_4prr",
+            "date": "2025-11-20",
+            "computer": "10",
+            "time": "23:00-24:00",
+            "user_login": "Batya",
+            "user_email": "antonvolckov78@gmail.com",
+            "user_id": "u_1763433359892_25124t",
+            "created_at": "2025-11-18T03:54:16.605Z",
+            "price_per_hour": 150,
+            "total": 150
+        },
+        {
+            "id": "b_1763438056605_4pv9",
+            "date": "2025-11-20",
+            "computer": "10",
+            "time": "21:00-22:00",
+            "user_login": "Batya",
+            "user_email": "antonvolckov78@gmail.com",
+            "user_id": "u_1763433359892_25124t",
+            "created_at": "2025-11-18T03:54:16.605Z",
+            "price_per_hour": 150,
+            "total": 150
+        },
+        {
+            "id": "b_1763438995061_2jqw",
+            "date": "2025-11-18",
+            "computer": "1",
+            "time": "04:00-05:00",
+            "user_login": "1",
+            "user_email": "i@mail.ru",
+            "user_id": "u_1763391527002_ycra8g",
+            "created_at": "2025-11-18T04:09:55.061Z",
+            "price_per_hour": 150,
+            "total": 150
+        },
+        {
+            "id": "b_1763438995061_1l3j",
+            "date": "2025-11-18",
+            "computer": "1",
+            "time": "05:00-06:00",
+            "user_login": "1",
+            "user_email": "i@mail.ru",
+            "user_id": "u_1763391527002_ycra8g",
+            "created_at": "2025-11-18T04:09:55.061Z",
+            "price_per_hour": 150,
+            "total": 150
         }
     ]
 }
